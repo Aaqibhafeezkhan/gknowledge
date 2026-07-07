@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=gknowledge
+GenericName=Knowledge Workstation
+Comment=Turn documents and notes into an evolving knowledge base
+Exec=gknowledge %U
+Icon=io.gknowledge.Gknowledge
+Terminal=false
+Categories=GTK;GNOME;Office;
+Keywords=knowledge;wiki;notes;llm;research;rag;
+StartupNotify=true

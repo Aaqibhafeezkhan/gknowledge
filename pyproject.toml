@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gknowledge"
+version = "0.1.0"
+description = "A native GNOME knowledge workstation that turns raw material into an evolving knowledge base."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "gknowledge contributors" }]
+keywords = ["gnome", "gtk", "knowledge-base", "llm", "wiki", "rag"]
+classifiers = [
+    "Environment :: X11 Applications :: GTK",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+]
+# PyGObject is provided by the system (python3-gi). The core has no hard deps.
+dependencies = []
+
+[project.optional-dependencies]
+pdf = ["pypdf>=4.0"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+gknowledge = "gknowledge.app:main"
+
+[tool.setuptools]
+packages = ["gknowledge", "gknowledge.core", "gknowledge.providers", "gknowledge.ui"]
+
+[tool.setuptools.package-data]
+"gknowledge.ui" = ["style.css"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

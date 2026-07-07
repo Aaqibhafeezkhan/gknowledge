@@ -1,0 +1,24 @@
+app-id: io.gknowledge.Gknowledge
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+command: gknowledge
+
+finish-args:
+  # Optional cloud LLM providers need network; offline mode does not use it.
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # Projects live in the user's files; a portal-based flow can tighten this later.
+  - --filesystem=home
+
+modules:
+  - name: gknowledge
+    buildsystem: simple
+    build-commands:
+      - make install PREFIX=/app PYTHON=/usr/bin/python3
+    sources:
+      - type: dir
+        path: ../..

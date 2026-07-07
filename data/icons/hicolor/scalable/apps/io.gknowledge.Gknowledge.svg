@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3584e4"/>
+      <stop offset="1" stop-color="#1a5fb4"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="url(#bg)"/>
+  <!-- open book -->
+  <path d="M64 40 C54 33 38 33 30 37 L30 90 C38 86 54 86 64 92 C74 86 90 86 98 90 L98 37 C90 33 74 33 64 40 Z"
+        fill="#ffffff" fill-opacity="0.95"/>
+  <path d="M64 40 L64 92" stroke="#1a5fb4" stroke-width="3" stroke-opacity="0.5"/>
+  <!-- knowledge graph nodes -->
+  <g fill="#1a5fb4">
+    <circle cx="44" cy="52" r="4"/>
+    <circle cx="84" cy="52" r="4"/>
+    <circle cx="52" cy="72" r="4"/>
+    <circle cx="76" cy="72" r="4"/>
+  </g>
+  <g stroke="#1a5fb4" stroke-width="2.5" stroke-opacity="0.7">
+    <line x1="44" y1="52" x2="52" y2="72"/>
+    <line x1="84" y1="52" x2="76" y2="72"/>
+    <line x1="52" y1="72" x2="76" y2="72"/>
+  </g>
+</svg>

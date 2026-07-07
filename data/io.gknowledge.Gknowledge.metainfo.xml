@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.gknowledge.Gknowledge</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>gknowledge</name>
+  <summary>Turn raw material into an evolving knowledge base</summary>
+  <description>
+    <p>
+      gknowledge is a native GNOME workstation for knowledge curation. It helps
+      you collect documents, notes and links, then incrementally transforms that
+      corpus into a structured, inspectable knowledge base with the help of
+      pluggable LLM providers.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Source-centric, local-first project format (readable Markdown + SQLite index)</li>
+      <li>Two-step LLM extraction with provenance and cross-links</li>
+      <li>Works fully offline with local heuristics — no API key required</li>
+      <li>Persistent, cache-aware ingestion queue with crash recovery</li>
+      <li>Assisted querying with citations back to your sources</li>
+      <li>Human-in-the-loop review queue</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.gknowledge.Gknowledge.desktop</launchable>
+  <categories>
+    <category>Office</category>
+    <category>Utility</category>
+  </categories>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-07-07">
+      <description><p>Initial native project shell, ingestion, extraction and query.</p></description>
+    </release>
+  </releases>
+</component>
