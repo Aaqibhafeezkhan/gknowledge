@@ -2,6 +2,12 @@
 
 All notable changes to gknowledge. Dates are release dates.
 
+## 0.2.2 — 2026-10-13
+
+**Packaging**
+- The app icon shows again in the dock and app grid: the SVG started with a long comment, so the image loader could not recognise the file and showed a blank icon.
+- `make uninstall` refreshes the icon cache, so removing a local install no longer leaves a blank icon behind.
+
 ## 0.2.1 — 2026-10-13
 
 **Packaging**

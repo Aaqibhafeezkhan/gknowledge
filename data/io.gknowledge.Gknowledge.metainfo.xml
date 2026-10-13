@@ -48,6 +48,11 @@
   </categories>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.2.2" date="2026-10-13">
+      <description>
+        <p>The app icon shows again in the dock and app grid.</p>
+      </description>
+    </release>
     <release version="0.2.1" date="2026-10-13">
       <description>
         <p>Packaging fixes: the .deb no longer ships the shared icon cache, and the installer works with apt's sandboxed download.</p>
