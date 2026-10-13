@@ -2,6 +2,12 @@
 
 All notable changes to gknowledge. Dates are release dates.
 
+## 0.2.1 — 2026-10-13
+
+**Packaging**
+- The `.deb` no longer ships `/usr/share/icons/hicolor/icon-theme.cache`; the system rebuilds it through dpkg triggers, so removing gknowledge cannot delete the shared icon cache.
+- `install.sh` makes the downloaded package readable by apt's `_apt` user (no more "Download is performed unsandboxed as root" notice) and warns when an older install in `~/.local` shadows the new one with the old icon.
+
 ## 0.2.0 — 2026-10-13
 
 **Agents**

@@ -82,8 +82,11 @@ install:
 	$(INSTALL) -m 644 data/icons/hicolor/scalable/apps/$(APP_ID).svg $(DESTDIR)$(ICONDIR)/$(APP_ID).svg
 	$(INSTALL) -d $(DESTDIR)$(METAINFODIR)
 	$(INSTALL) -m 644 data/$(APP_ID).metainfo.xml $(DESTDIR)$(METAINFODIR)/$(APP_ID).metainfo.xml
-	-update-desktop-database $(DESTDIR)$(APPSDIR) 2>/dev/null || true
-	-gtk-update-icon-cache -f -t $(DESTDIR)$(DATADIR)/icons/hicolor 2>/dev/null || true
+	@# Refresh caches only for a live install; packages leave this to dpkg triggers.
+	@if [ -z "$(DESTDIR)" ]; then \
+		update-desktop-database $(APPSDIR) 2>/dev/null || true; \
+		gtk-update-icon-cache -f -t $(DATADIR)/icons/hicolor 2>/dev/null || true; \
+	fi
 	@echo ">> Done. Make sure $(BINDIR) is on your PATH, then run: gknowledge"
 
 uninstall:

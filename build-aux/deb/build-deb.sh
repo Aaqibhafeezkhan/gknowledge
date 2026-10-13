@@ -11,6 +11,8 @@ trap 'rm -rf "$PKG"' EXIT
 make -C "$ROOT" install DESTDIR="$PKG" PREFIX=/usr PYTHON=/usr/bin/python3 >/dev/null
 # The Makefile's cache refresh helpers are not meaningful inside DESTDIR.
 find "$PKG" -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
+# Shared caches belong to the system (dpkg triggers rebuild them), never to us.
+find "$PKG" \( -name icon-theme.cache -o -name mimeinfo.cache \) -delete
 
 mkdir -p "$PKG/DEBIAN" "$OUT"
 SIZE=$(du -sk "$PKG/usr" | cut -f1)

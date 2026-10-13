@@ -33,8 +33,15 @@ install_deb() {
   info "Downloading the latest gknowledge .deb"
   curl -fL --progress-bar -o "$TMP/gknowledge_all.deb" "$BASE/gknowledge_all.deb" \
     || die "Download failed from $BASE/gknowledge_all.deb"
+  # apt downloads as the unprivileged _apt user, which cannot enter mktemp's 0700 dir.
+  chmod 755 "$TMP"
+  chmod 644 "$TMP/gknowledge_all.deb"
   info "Installing with apt (you may be asked for your password)"
   sudo_cmd apt-get install -y "$TMP/gknowledge_all.deb"
+  if [ -e "$HOME/.local/bin/gknowledge" ] || [ -e "$HOME/.local/share/applications/io.gknowledge.Gknowledge.desktop" ]; then
+    warn "An older gknowledge in ~/.local shadows this install (old icon and version)."
+    warn "Remove it with: rm -rf ~/.local/bin/gknowledge ~/.local/bin/gknowledge-mcp ~/.local/share/gknowledge ~/.local/share/applications/io.gknowledge.Gknowledge.desktop ~/.local/share/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg ~/.local/share/metainfo/io.gknowledge.Gknowledge.metainfo.xml"
+  fi
   info "Done. Launch gknowledge from the app grid or run: gknowledge"
 }
 
