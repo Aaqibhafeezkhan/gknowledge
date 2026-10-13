@@ -27,7 +27,8 @@ from .project import Project
 Progress = Callable[[str, Job, str], None]
 
 IMPORTABLE_SUFFIXES = (
-    parsers.TEXT_EXTS | parsers.HTML_EXTS | parsers.CODE_EXTS | {".pdf"}
+    parsers.TEXT_EXTS | parsers.HTML_EXTS | parsers.CODE_EXTS
+    | parsers.EPUB_EXTS | {".pdf"}
 )
 
 
