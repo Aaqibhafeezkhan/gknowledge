@@ -4,7 +4,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <name>gknowledge</name>
-  <summary>Turn raw material into an evolving knowledge base</summary>
+  <summary>Turn documents into a living wiki</summary>
   <description>
     <p>
       gknowledge is a native GNOME workstation for knowledge curation. It helps
@@ -22,6 +22,25 @@
       <li>Human-in-the-loop review queue</li>
     </ul>
   </description>
+  <developer id="io.github.openapi">
+    <name>gknowledge contributors</name>
+  </developer>
+  <url type="homepage">https://github.com/openapi/gknowledge</url>
+  <url type="bugtracker">https://github.com/openapi/gknowledge/issues</url>
+  <url type="vcs-browser">https://github.com/openapi/gknowledge</url>
+  <url type="contribute">https://github.com/openapi/gknowledge/blob/main/CONTRIBUTING.md</url>
+  <branding>
+    <color type="primary" scheme_preference="light">#a8c7fa</color>
+    <color type="primary" scheme_preference="dark">#1c3d6e</color>
+  </branding>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+  </supports>
   <launchable type="desktop-id">io.gknowledge.Gknowledge.desktop</launchable>
   <categories>
     <category>Office</category>

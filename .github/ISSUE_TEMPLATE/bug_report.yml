@@ -1,0 +1,13 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    attributes: { label: What happened?, description: Steps to reproduce and what you expected }
+    validations: { required: true }
+  - type: input
+    attributes: { label: Version and install method, placeholder: "0.1.0, make install / Flatpak" }
+  - type: dropdown
+    attributes:
+      label: Provider
+      options: [offline, OpenAI-compatible (remote), OpenAI-compatible (local, e.g. Ollama)]

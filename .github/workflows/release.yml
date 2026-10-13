@@ -1,0 +1,22 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  flatpak-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.gnome.Platform//51 org.gnome.Sdk//51
+      - run: |
+          flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.gknowledge.Gknowledge.yaml
+          flatpak build-bundle repo gknowledge-${GITHUB_REF_NAME}.flatpak io.gknowledge.Gknowledge
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: gknowledge-*.flatpak
+          generate_release_notes: true

@@ -1,6 +1,6 @@
 app-id: io.gknowledge.Gknowledge
 runtime: org.gnome.Platform
-runtime-version: '46'
+runtime-version: '51'
 sdk: org.gnome.Sdk
 command: gknowledge
 
@@ -11,8 +11,8 @@ finish-args:
   - --socket=wayland
   - --socket=fallback-x11
   - --device=dri
-  # Projects live in the user's files; a portal-based flow can tighten this later.
-  - --filesystem=home
+  # No broad filesystem access: projects are chosen through Gtk.FileDialog,
+  # which goes through the document portal inside the sandbox.
 
 modules:
   - name: gknowledge

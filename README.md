@@ -14,12 +14,13 @@ The goal is to build a serious native app for Linux desktops that makes knowledg
 **LLM wiki / auto-knowledge-base builders** (the closest peers, several studied in [`NOTES.md`](NOTES.md)):
 
 - [LLM Wiki (`nashsu/llm_wiki`)](https://github.com/nashsu/llm_wiki) — Tauri desktop app implementing Karpathy's incremental "LLM builds and maintains a wiki" pattern
-- [Tolaria](https://github.com/) — files-first, git-first Markdown knowledge base with AI-assisted editing
+- [Tolaria](https://github.com/refactoringhq/tolaria) — files-first, git-first Markdown knowledge base with AI-assisted editing
 - [WeKnora (Tencent)](https://github.com/Tencent/WeKnora) — enterprise RAG + agents + auto-wiki framework
 - [OpenKnowledge (Inkeep)](https://openknowledge.ai) — WYSIWYG Markdown editor with agent/MCP integrations for LLM wikis
-- [Google NotebookLM](https://notebooklm.google.com) — source-grounded notebooks with cited answers (cloud-only)
 - [Reor](https://github.com/reorproject/reor) — local-first AI note-taking that auto-links related notes
 - [Khoj](https://github.com/khoj-ai/khoj) — self-hostable AI "second brain" over your documents
+
+_Not a peer: [Google NotebookLM](https://notebooklm.google.com) offers a similar cited-notebook experience but is closed-source and cloud-only._
 
 **Document RAG / "chat with your knowledge" engines:**
 
@@ -40,6 +41,13 @@ The goal is to build a serious native app for Linux desktops that makes knowledg
 - **Inspectable, user-owned format** — knowledge is plain Markdown with YAML frontmatter (Obsidian-compatible) plus a readable SQLite index; nothing is locked behind a sync service.
 - **Incremental, not stateless RAG** — sources are ingested once into a persistent, cross-linked knowledge space with provenance, rather than re-retrieved from scratch on every question.
 - **Human-in-the-loop** — generated content is clearly marked and a review queue keeps you in editorial control.
+
+## Project docs
+
+- [`ROADMAP.md`](ROADMAP.md) — milestones and the features we are borrowing from peers
+- [`TODO.md`](TODO.md) — actionable backlog
+- [`DISTRIBUTING.md`](DISTRIBUTING.md) — positioning and distribution study of comparable projects (Italian)
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
 
 ## Status
 
@@ -67,7 +75,7 @@ make test             # run the headless core test suite
 make install          # install locally into ~/.local (adds a `gknowledge` launcher + .desktop entry)
 make install PREFIX=/usr/local   # system-wide (use with sudo)
 make uninstall        # remove a local install
-make flatpak          # build/install a Flatpak (needs flatpak-builder + org.gnome.Sdk 46)
+make flatpak          # build/install a Flatpak (needs flatpak-builder + org.gnome.Sdk 51)
 ```
 
 After `make install`, launch **gknowledge** from your app grid, or run `gknowledge`

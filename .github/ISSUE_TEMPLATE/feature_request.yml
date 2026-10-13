@@ -1,0 +1,9 @@
+name: Feature request
+description: Suggest an improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes: { label: What problem would this solve? }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: Proposed behaviour, description: Mention any peer app that does this well }
