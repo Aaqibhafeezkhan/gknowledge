@@ -1,17 +1,103 @@
-# gknowledge
-
-**A native GNOME knowledge workstation that turns raw material into an evolving knowledge base.**
-
-`gknowledge` is a desktop application for GNOME that helps users collect documents, notes, links, and research material, then incrementally transform that corpus into a structured knowledge space with the support of LLMs.
-
-The goal is not to build yet another chat wrapper.
-The goal is to build a serious native app for Linux desktops that makes knowledge curation, synthesis, and retrieval feel like a first-class operating system capability.
-
 <p align="center">
-  <img src="docs/demo.svg" alt="gknowledge in action: drop documents, get a linked wiki, ask questions with citations" width="860">
+  <img src="data/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg" alt="" width="96">
 </p>
 
-<sub>The animation is generated from the real core on the chess sample documents in `data/demo/chess` (offline engine, no API key). Regenerate it with `make demo-svg`.</sub>
+<h1 align="center">gknowledge</h1>
+
+<p align="center">
+  <b>Drop in your documents. Get a linked wiki that an LLM keeps up to date.</b><br>
+  A native GNOME app. Offline by default, plain Markdown on disk, Obsidian-compatible.<br>
+  Bring your own brain: a local model, any OpenAI-compatible endpoint, or your own ChatGPT plan.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/openapi/gknowledge?style=for-the-badge&color=3584e4"></a>
+  <img alt="GTK 4" src="https://img.shields.io/badge/GTK-4-4a86cf?style=for-the-badge&logo=gtk&logoColor=white">
+  <img alt="Libadwaita" src="https://img.shields.io/badge/Libadwaita-1.5%2B-4a86cf?style=for-the-badge&logo=gnome&logoColor=white">
+  <img alt="Ubuntu 24.04+" src="https://img.shields.io/badge/Ubuntu-24.04%2B-E95420?style=for-the-badge&logo=ubuntu&logoColor=white">
+</p>
+
+<p align="center">
+  <a href="https://github.com/openapi/gknowledge/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/openapi/gknowledge/ci.yml?branch=main&style=flat-square&label=CI"></a>
+  <a href="https://github.com/openapi/gknowledge/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/openapi/gknowledge?style=flat-square&logo=github"></a>
+  <a href="https://github.com/openapi/gknowledge/issues"><img alt="Issues" src="https://img.shields.io/github/issues/openapi/gknowledge?style=flat-square"></a>
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/openapi/gknowledge?style=flat-square">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white">
+  <img alt="Offline first" src="https://img.shields.io/badge/offline-first-2ea043?style=flat-square">
+  <img alt="No API key needed" src="https://img.shields.io/badge/API%20key-not%20required-2ea043?style=flat-square">
+  <img alt="Obsidian compatible" src="https://img.shields.io/badge/Obsidian-compatible-7C3AED?style=flat-square&logo=obsidian&logoColor=white">
+  <img alt="Karpathy LLM Wiki pattern" src="https://img.shields.io/badge/pattern-Karpathy%20LLM%20Wiki-f59e0b?style=flat-square">
+  <img alt="Sign in with ChatGPT" src="https://img.shields.io/badge/Sign%20in%20with-ChatGPT-10a37f?style=flat-square&logo=openai&logoColor=white">
+  <img alt="Ollama" src="https://img.shields.io/badge/Ollama-supported-000000?style=flat-square">
+  <img alt="Flatpak planned" src="https://img.shields.io/badge/Flatpak-planned-4a86cf?style=flat-square&logo=flatpak&logoColor=white">
+  <img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square">
+</p>
+
+<p align="center">
+  <img src="docs/demo.svg" alt="gknowledge in action: drop in AI research papers, get a linked wiki, ask a question and get an answer with citations" width="880">
+</p>
+
+<p align="center"><sub>
+  Real output of the offline engine on six AI papers (<code>data/demo/papers</code>), no API key.
+  Regenerate with <code>make demo-svg</code>.
+</sub></p>
+
+## Why gknowledge
+
+If you have used [LLM Wiki](https://github.com/nashsu/llm_wiki), [Tolaria](https://github.com/refactoringhq/tolaria), [OpenKnowledge](https://github.com/inkeep/open-knowledge), [Reor](https://github.com/reorproject/reor) or [Khoj](https://github.com/khoj-ai/khoj), you already know the loop: **ingest sources, let the model build and maintain a wiki, then ask questions against it.** gknowledge does the same thing as a real GNOME application.
+
+- **Native, not a web view.** GTK 4 and Libadwaita, built to follow the GNOME HIG. No Electron, no Tauri, no browser engine.
+- **Works with no account.** A built-in heuristic engine ingests and answers offline. Add a model when you want better synthesis.
+- **Your data stays yours.** Markdown with YAML frontmatter plus a readable SQLite index. Open the folder in Obsidian or any editor.
+- **Cited, reviewable, incremental.** Every generated page records its sources, answers cite pages, and a review queue keeps you in control.
+
+## The workflow you already know
+
+| You know this from… | What it is | In gknowledge |
+|---|---|---|
+| Karpathy's LLM Wiki, LLM Wiki | **Ingest**: read a new source, update the pages it touches | Done: two-step extraction with provenance |
+| Reor, Khoj | **Ask**: questions answered from your notes, with citations | Done: lexical search plus graph expansion, citations, saved answers |
+| LLM Wiki, OpenKnowledge | `index.md` and `log.md`, `[[wikilinks]]`, Obsidian-compatible vault | Done |
+| LLM Wiki, Tolaria | **Review** AI changes before they stick | Review queue done, Git diff planned |
+| Karpathy's LLM Wiki, OpenKnowledge | **Lint**: orphans, contradictions, stale pages | Planned |
+| LLM Wiki | Knowledge graph, clusters, gaps | Planned |
+| Tolaria, OpenKnowledge, LLM Wiki | MCP server so agents can read and write the wiki | Planned |
+| LLM Wiki | Web clipper, folder watch, deep research | Planned |
+
+See [`ROADMAP.md`](ROADMAP.md) for dates and [`TODO.md`](TODO.md) for the backlog.
+
+## Quick start
+
+```bash
+sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1   # Ubuntu / Debian
+git clone https://github.com/openapi/gknowledge && cd gknowledge
+make start      # opens a demo project with six AI papers already ingested
+```
+
+`make start` also restarts the app whenever you edit the source, which makes it the fastest way to hack on gknowledge. Install it for daily use with `make install`.
+
+## Bring your own brain
+
+| Provider | Needs | Notes |
+|---|---|---|
+| **Offline** (default) | nothing | Heuristic extraction and extractive answers. Fully private. |
+| **ChatGPT plan** | A Plus or Pro account | Preferences, Provider, *Sign in with ChatGPT*. Usage is charged to your own plan, no API key. |
+| **Ollama / LM Studio / vLLM** | A local server | Any OpenAI-compatible endpoint on your machine. |
+| **OpenAI-compatible cloud** | An API key | OpenAI, OpenRouter, Together, and similar. |
+
+Nothing is sent anywhere unless you pick a provider that is not offline.
+
+## How it compares
+
+| | gknowledge | LLM Wiki | Tolaria | OpenKnowledge | Reor (archived) | Khoj |
+|---|---|---|---|---|---|---|
+| Native GNOME / GTK 4 | **yes** | Tauri | Tauri | Electron | Electron | web + Electron |
+| Works offline, no key | **yes** | needs a model | AI optional | agent-driven | local model | self-host |
+| Plain Markdown vault | **yes** | yes | yes | yes | yes | reads yours |
+| Linux packaging | `.deb`, Flatpak planned | `.deb`, AppImage | AppImage, `.deb` | `.deb`, `.rpm` | AppImage | pip, Docker |
+| License | MIT | GPL-3.0 | AGPL-3.0 | GPL-3.0 | AGPL-3.0 | AGPL-3.0 |
+
+Details and history of each project are in [`DISTRIBUTING.md`](DISTRIBUTING.md).
 
 ## gknowledge is an alternative to…
 

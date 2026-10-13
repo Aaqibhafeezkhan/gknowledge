@@ -1,6 +1,8 @@
 """Generate docs/demo.svg: an animated (SMIL) walkthrough of gknowledge.
 
-Everything shown comes from the real core: the chess sample documents are
+The theme is "reading AI papers", the scenario users of LLM-wiki tools know
+best (Karpathy's gist, LLM Wiki's Research template, Reor, Khoj). Everything
+shown comes from the real core: the sample documents are
 ingested with the offline engine and the page titles, summaries, counts and
 answer text are read back from the resulting project. Regenerate with:
 
@@ -9,6 +11,7 @@ answer text are read back from the resulting project. Regenerate with:
 from __future__ import annotations
 
 import html
+import os
 import sys
 import tempfile
 import textwrap
@@ -24,7 +27,21 @@ from gknowledge.core.query import QueryEngine  # noqa: E402
 from gknowledge.providers import build_provider  # noqa: E402
 
 OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "docs" / "demo.svg"
-QUESTION = "What is the Ruy Lopez?"
+TOPIC = os.environ.get("TOPIC", "papers")
+CONFIG = {
+    "papers": dict(name="Papers demo", question="What is retrieval-augmented generation?",
+                   page="Attention Is All You Need",
+                   chosen=["Attention Is All You Need", "BERT", "GPT-3",
+                           "Retrieval-Augmented Generation", "Chain-of-Thought Prompting",
+                           "LLM Wiki Pattern", "Ashish Vaswani", "Andrej Karpathy"],
+                   chips=["Transformer", "BERT", "Ashish Vaswani"]),
+    "chess": dict(name="Chess demo", question="What is the Ruy Lopez?", page="Ruy Lopez",
+                  chosen=["Ruy Lopez", "Deep Blue versus Kasparov", "Deep Blue",
+                          "Garry Kasparov", "Vladimir Kramnik", "Bobby Fischer",
+                          "Sicilian Defence", "Wilhelm Steinitz"],
+                  chips=["Garry Kasparov", "Vladimir Kramnik", "Sicilian Defence"]),
+}[TOPIC]
+QUESTION = CONFIG["question"]
 T = 24.0                      # loop length in seconds
 import os
 FRAME = float(os.environ["FRAME"]) if os.environ.get("FRAME") else None  # debug: static frame
@@ -33,6 +50,10 @@ FRAME = float(os.environ["FRAME"]) if os.environ.get("FRAME") else None  # debug
 SIDEBAR, CONTENT, TEXT, DIM = "#303030", "#1e1e1e", "#ffffff", "#959595"
 ICON, SELECT, ACCENT, BORDER = "#c0c0c0", "#444444", "#3584e4", "#1f1f1f"
 FONT = "Cantarell, 'Noto Sans', 'Ubuntu', 'DejaVu Sans', sans-serif"
+
+
+def short(s: str, n: int = 27) -> str:
+    return s if len(s) <= n else s[: n - 1].rstrip() + "…"
 
 
 def esc(s: str) -> str:
@@ -49,16 +70,16 @@ def clean(s: str, title: str = "") -> str:
 # -- real data ----------------------------------------------------------------
 def collect():
     tmp = Path(tempfile.mkdtemp())
-    proj = Project.create(tmp / "p", name="Chess demo")
+    proj = Project.create(tmp / "p", name=CONFIG["name"])
     proj.save_settings(Settings(provider="offline"))
     mgr = IngestionManager(proj)
-    files = sorted((ROOT / "data" / "demo" / "chess").glob("*.md"))
+    files = sorted((ROOT / "data" / "demo" / TOPIC).glob("*.md"))
     for f in files:
         mgr.import_file(f)
     mgr.process_pending()
     pages = {p.title: p for p in proj.store.list_pages()}
     w = KnowledgeWriter(proj)
-    page = pages["Ruy Lopez"]
+    page = pages[CONFIG["page"]]
     body = w.read_body(page)
     summary, points = "", []
     section = ""
@@ -68,28 +89,34 @@ def collect():
         elif section == "Summary" and line.strip():
             summary += " " + line.strip()
         elif section == "Key points" and line.startswith("- "):
-            points.append(clean(line[2:], "Ruy Lopez"))
+            points.append(clean(line[2:], CONFIG["page"]))
     engine = QueryEngine(proj, build_provider(proj.settings.as_dict()))
     res = engine.query(QUESTION)
     first = next(l for l in res.answer.splitlines() if l.startswith("- #"))
-    answer = clean(first[2:], "Ruy Lopez")
+    answer = clean(first[2:], res.citations[0].title)
     answer = answer.rsplit(" [", 1)[0]
+    if "." in answer:                       # the engine truncates snippets mid-word
+        answer = answer[: answer.rfind(". ") + 1] if ". " in answer else answer
     cites, seen = [], set()
     for c in res.citations:
         if c.title not in seen:
             seen.add(c.title)
             cites.append((c.number, c.title, c.kind))
-    chosen = [t for t in ("Ruy Lopez", "Deep Blue versus Kasparov", "Deep Blue",
-                          "Garry Kasparov", "Vladimir Kramnik", "Bobby Fischer",
-                          "Sicilian Defence", "Wilhelm Steinitz") if t in pages]
+    chosen = [x for x in CONFIG["chosen"] if x in pages]
+    link_titles = {pg.slug: pg.title for pg in pages.values()}
+    import re
+    linked = [link_titles[s] for s in re.findall(r"\[\[([^\]|]+)", body) if s in link_titles]
+    chips = [c for c in CONFIG["chips"] if c in pages]
     titles = [s.title for s in sorted(proj.store.list_sources(), key=lambda s: s.title)]
     return {
         "files": titles,
         "n_pages": len(pages),
         "pages": [(t, pages[t].kind.value) for t in chosen],
-        "summary": clean(summary, "Ruy Lopez"),
+        "summary": clean(summary, CONFIG["page"]),
         "points": points[:3],
-        "answer": answer, "cites": cites[:3],
+        "answer": answer, "cites": cites[:3], "chips": chips,
+        "page_title": CONFIG["page"], "page_file": page.slug + ".md",
+        "project": CONFIG["name"],
     }
 
 
@@ -152,7 +179,7 @@ def build(d) -> str:
     o.append(f'<rect x="{SB}" y="0" width="1" height="{H - 44}" fill="{BORDER}"/>')
     # sidebar header
     o.append(text(26, 31, "+", 22, ICON, "middle"))
-    o.append(text(SB / 2, 22, "Chess demo", 13, TEXT, "middle", "700"))
+    o.append(text(SB / 2, 22, d["project"], 13, TEXT, "middle", "700"))
     o.append(text(SB / 2, 38, "Offline (local heuristics)", 10, DIM, "middle"))
     o.append(text(SB - 24, 30, "≡", 20, ICON, "middle"))
     # tabs
@@ -173,7 +200,7 @@ def build(d) -> str:
         y = 72 + i * 46
         t0 = 1.2 + 0.45 * i
         row = (f'<circle cx="30" cy="{y - 4}" r="9" fill="none" stroke="{ICON}" stroke-width="1.5"/>'
-               + text(50, y, name, 13)
+               + text(50, y, short(name), 13)
                + g(text(50, y + 16, "queued", 10, DIM), 0, 7.0)
                + g(text(50, y + 16, "ingested", 10, DIM), 7.0, 8.5))
         rows.append(g(row, t0, 8.5))
@@ -199,19 +226,19 @@ def build(d) -> str:
         if i == 0:
             row += f'<rect x="8" y="{y - 24}" width="{SB - 16}" height="40" rx="8" fill="{SELECT}"/>'
         row += (f'<circle cx="30" cy="{y - 4}" r="9" fill="none" stroke="{ICON}" stroke-width="1.5"/>'
-                + text(50, y, title, 13) + text(50, y + 16, kind, 10, DIM)
+                + text(50, y, short(title), 13) + text(50, y + 16, kind, 10, DIM)
                 + text(SB - 24, y, "AI", 10, DIM, "middle"))
         kr.append(g(row, 8.8 + 0.3 * i, 15.0))
     o.append("".join(kr))
-    page = [text(310, 100, "Ruy Lopez", 24, TEXT, weight="700"),
-            text(310, 124, "type: source · generated · linked to ruy-lopez.md", 11, DIM),
+    page = [text(310, 100, d["page_title"], 24, TEXT, weight="700"),
+            text(310, 124, f"type: source · generated · from {d['page_file']}", 11, DIM),
             text(310, 160, "Summary", 14, TEXT, weight="700"),
             wrapped(310, 182, d["summary"], 78, 12.5, TEXT, 18, 5),
             text(310, 292, "Key points", 14, TEXT, weight="700")]
     for i, pt in enumerate(d["points"]):
         page.append(wrapped(322, 314 + i * 40, "• " + pt, 74, 12.5, TEXT, 18, 2))
-    page.append(text(310, 440, "Linked pages", 14, TEXT, weight="700"))
-    for i, nm in enumerate(["Garry Kasparov", "Vladimir Kramnik", "Sicilian Defence"]):
+    page.append(text(310, 440, "Related pages", 14, TEXT, weight="700"))
+    for i, nm in enumerate(d["chips"]):
         x = 310 + i * 160
         page.append(f'<rect x="{x}" y="452" width="148" height="26" rx="13" fill="#2f4a73"/>'
                     + text(x + 74, 470, "[[" + nm + "]]", 11, "#cfe0ff", "middle"))
