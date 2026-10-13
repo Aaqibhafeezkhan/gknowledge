@@ -70,7 +70,8 @@ On Debian/Ubuntu: `sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1`.
 Optional: `pip install --user pypdf` for PDF sources.
 
 ```bash
-make run              # run from the source tree
+make start            # run from source on a pre-ingested demo project (./sandbox, isolated config)
+make run              # run from the source tree (opens your last project)
 make test             # run the headless core test suite
 make install          # install locally into ~/.local (adds a `gknowledge` launcher + .desktop entry)
 make install PREFIX=/usr/local   # system-wide (use with sudo)

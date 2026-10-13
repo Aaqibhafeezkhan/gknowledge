@@ -18,13 +18,14 @@ METAINFODIR := $(DATADIR)/metainfo
 
 INSTALL     := install
 
-.PHONY: all help check test run dev install uninstall clean dist flatpak
+.PHONY: all help check test run dev start install uninstall clean dist flatpak
 
 all: help
 
 help:
 	@echo "gknowledge — targets:"
-	@echo "  make run        Run the app from the source tree"
+	@echo "  make start      Run from source on a sandbox project (./sandbox/demo), ready to use"
+	@echo "  make run        Run the app from the source tree (opens your last project)"
 	@echo "  make test       Run the headless core test suite"
 	@echo "  make check      Byte-compile all sources (syntax check)"
 	@echo "  make install    Install locally into $(PREFIX)"
@@ -43,6 +44,20 @@ run:
 	$(PYTHON) -m gknowledge
 
 dev: run
+
+# Launch the app from the source tree on a throwaway demo project so you can
+# see and use it immediately. Config (recent projects, provider settings) is
+# kept in ./sandbox/config so your real settings are never touched.
+SANDBOX     := sandbox
+DEMO        := $(SANDBOX)/demo
+
+start:
+	@mkdir -p $(SANDBOX)/config
+	@if [ ! -f $(DEMO)/gknowledge.json ]; then \
+		echo ">> Creating and ingesting demo project in $(DEMO)"; \
+		$(PYTHON) build-aux/dev/seed_demo.py $(DEMO); \
+	fi
+	XDG_CONFIG_HOME=$(CURDIR)/$(SANDBOX)/config PYTHONPATH=. $(PYTHON) -m gknowledge $(DEMO)
 
 install:
 	@echo ">> Installing gknowledge into $(DESTDIR)$(PREFIX)"
