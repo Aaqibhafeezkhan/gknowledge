@@ -22,3 +22,6 @@ venv/
 
 # Local gknowledge projects created during development
 /sandbox/
+
+# Scratch files (screenshots, notes)
+/temp/

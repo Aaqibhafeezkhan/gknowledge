@@ -6,3 +6,43 @@
 .gk-content {
   background: transparent;
 }
+
+/* Palette modelled on Nautilus: a lighter sidebar next to a darker content
+   pane, headers matching their pane, dimmed icons, subtle selection.
+   Only libadwaita named colours are used so light/dark/accent follow the system. */
+.gk-sidebar {
+  background-color: @sidebar_bg_color;
+  color: @sidebar_fg_color;
+}
+
+.gk-sidebar headerbar {
+  background-color: @sidebar_bg_color;
+  box-shadow: none;
+}
+
+.gk-content-pane {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+  border-left: 1px solid @sidebar_border_color;
+}
+
+.gk-content-pane headerbar {
+  background-color: @view_bg_color;
+  box-shadow: none;
+}
+
+/* Icons are a step quieter than the labels, as in Nautilus. */
+.gk-sidebar row image,
+.gk-sidebar button image,
+.gk-content-pane headerbar image {
+  color: alpha(currentColor, 0.7);
+}
+
+.gk-sidebar row:selected {
+  background-color: alpha(currentColor, 0.14);
+}
+
+.gk-sidebar row:hover:not(:selected) {
+  background-color: alpha(currentColor, 0.07);
+}
+

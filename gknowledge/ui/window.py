@@ -131,6 +131,7 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.side_stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE)
         side_view = Adw.ToolbarView()
+        side_view.add_css_class("gk-sidebar")
         side_view.add_top_bar(side_header)
         side_view.set_content(self.side_stack)
 
@@ -142,6 +143,7 @@ class MainWindow(Adw.ApplicationWindow):
         header = Adw.HeaderBar(show_start_title_buttons=False,
                                title_widget=self.view_switcher)
         content_view = Adw.ToolbarView()
+        content_view.add_css_class("gk-content-pane")
         content_view.add_top_bar(header)
         content_view.set_content(self.view_stack)
 
