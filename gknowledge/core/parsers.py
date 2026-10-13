@@ -10,10 +10,12 @@ from __future__ import annotations
 import html
 import mimetypes
 import re
+import zipfile
 from pathlib import Path
 
 TEXT_EXTS = {".md", ".markdown", ".txt", ".text", ".rst", ".org", ".csv", ".log"}
 HTML_EXTS = {".html", ".htm"}
+EPUB_EXTS = {".epub"}
 CODE_EXTS = {".py", ".js", ".ts", ".json", ".yaml", ".yml", ".toml", ".ini"}
 
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -48,6 +50,27 @@ def _extract_pdf(path: Path) -> str:
         return ""
 
 
+def _extract_epub(path: Path) -> str:
+    # An epub is a zip of XHTML documents; stdlib is enough for the common case.
+    try:
+        zf = zipfile.ZipFile(path)
+    except Exception:
+        return ""  # corrupt or not a zip at all
+    parts = []
+    with zf:
+        # Sorted so reading order is stable across platforms and zip writers.
+        for name in sorted(zf.namelist()):
+            if not name.endswith((".xhtml", ".html", ".htm")):
+                continue
+            # TODO: honour the charset declared per document instead of utf-8
+            try:
+                raw = zf.read(name).decode("utf-8", errors="replace")
+                parts.append(_strip_html(raw))
+            except Exception:
+                continue
+    return "\n\n".join(parts)
+
+
 def normalize(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = _WS_RE.sub(" ", text)
@@ -65,6 +88,8 @@ def parse(path: str | Path) -> str:
         return normalize(_strip_html(_read_text(p)))
     if ext == ".pdf":
         return normalize(_extract_pdf(p))
+    if ext in EPUB_EXTS:
+        return normalize(_extract_epub(p))
     # Fall back to a best-effort text read for unknown extensions.
     try:
         return normalize(_read_text(p))
