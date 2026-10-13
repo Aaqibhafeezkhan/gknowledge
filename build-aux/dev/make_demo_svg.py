@@ -26,7 +26,7 @@ from gknowledge.core.project import Project, Settings  # noqa: E402
 from gknowledge.core.query import QueryEngine  # noqa: E402
 from gknowledge.providers import build_provider  # noqa: E402
 
-OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "docs" / "demo.svg"
+OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "docs" / "gknowledge-demo.svg"
 TOPIC = os.environ.get("TOPIC", "papers")
 CONFIG = {
     "papers": dict(name="Papers demo", question="What is retrieval-augmented generation?",
@@ -42,7 +42,7 @@ CONFIG = {
                   chips=["Garry Kasparov", "Vladimir Kramnik", "Sicilian Defence"]),
 }[TOPIC]
 QUESTION = CONFIG["question"]
-T = 24.0                      # loop length in seconds
+T = 26.0                      # loop length in seconds
 import os
 FRAME = float(os.environ["FRAME"]) if os.environ.get("FRAME") else None  # debug: static frame
 
@@ -90,6 +90,7 @@ def collect():
             summary += " " + line.strip()
         elif section == "Key points" and line.startswith("- "):
             points.append(clean(line[2:], CONFIG["page"]))
+    summary = clean(summary, CONFIG["page"])
     engine = QueryEngine(proj, build_provider(proj.settings.as_dict()))
     res = engine.query(QUESTION)
     first = next(l for l in res.answer.splitlines() if l.startswith("- #"))
@@ -97,11 +98,15 @@ def collect():
     answer = answer.rsplit(" [", 1)[0]
     if "." in answer:                       # the engine truncates snippets mid-word
         answer = answer[: answer.rfind(". ") + 1] if ". " in answer else answer
+    # Show the real top citation plus any other cited *source* pages; the
+    # offline engine also cites fragment entities that would only add noise.
     cites, seen = [], set()
-    for c in res.citations:
-        if c.title not in seen:
-            seen.add(c.title)
-            cites.append((c.number, c.title, c.kind))
+    for i, c in enumerate(res.citations):
+        if c.title in seen or (i and c.kind != "source"):
+            continue
+        seen.add(c.title)
+        cites.append((c.number, c.title, c.kind))
+    more = len(res.citations) - len(cites)
     chosen = [x for x in CONFIG["chosen"] if x in pages]
     link_titles = {pg.slug: pg.title for pg in pages.values()}
     import re
@@ -112,29 +117,74 @@ def collect():
         "files": titles,
         "n_pages": len(pages),
         "pages": [(t, pages[t].kind.value) for t in chosen],
-        "summary": clean(summary, CONFIG["page"]),
+        "summary": summary,
         "points": points[:3],
-        "answer": answer, "cites": cites[:3], "chips": chips,
+        "answer": answer, "cites": cites[:3], "more": more, "chips": chips,
         "page_title": CONFIG["page"], "page_file": page.slug + ".md",
         "project": CONFIG["name"],
     }
 
 
+# -- text metrics ------------------------------------------------------------------
+# Widths are measured with DejaVu Sans, wider than Cantarell, Ubuntu, Segoe UI
+# or Helvetica, so text that fits here fits wherever the SVG is viewed.
+try:
+    from PIL import ImageFont
+    _FONTS = {}
+
+    def text_w(s: str, size: float, bold: bool = False) -> float:
+        key = (round(size * 4), bold)
+        if key not in _FONTS:
+            name = "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
+            _FONTS[key] = ImageFont.truetype(name, size=size * 4)
+        return _FONTS[key].getlength(s) / 4
+except Exception:  # noqa: BLE001
+    def text_w(s: str, size: float, bold: bool = False) -> float:
+        return len(s) * size * (0.66 if bold else 0.6)
+
+
+def fit(s: str, size: float, maxw: float, bold: bool = False) -> str:
+    if text_w(s, size, bold) <= maxw:
+        return s
+    while s and text_w(s + "…", size, bold) > maxw:
+        s = s[:-1]
+    return s.rstrip() + "…"
+
+
+def wrap_px(s: str, size: float, maxw: float) -> list[str]:
+    lines, cur = [], ""
+    for word in s.split():
+        cand = f"{cur} {word}".strip()
+        if text_w(cand, size) <= maxw:
+            cur = cand
+        else:
+            lines.append(cur)
+            cur = word
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def sentences_fitting(s: str, size: float, maxw: float, max_lines: int) -> list[str]:
+    """Whole sentences only, never a cut-off one."""
+    out: list[str] = []
+    for sent in [x.strip() for x in s.replace(". ", ".\n").splitlines() if x.strip()]:
+        trial = wrap_px(" ".join([*(" ".join(out).split()), *sent.split()]), size, maxw)
+        if len(trial) > max_lines:
+            break
+        out = trial
+    return out or wrap_px(s, size, maxw)[:max_lines]
+
+
 # -- svg helpers -----------------------------------------------------------------
 def vis(start: float, end: float, fade: float = 0.25) -> str:
-    """opacity animation: hidden, fade in at start, fade out at end."""
-    s, e = start / T, min(end, T) / T
-    f = fade / T
-    kt = [0, max(s - 0.0001, 0), min(s + f, 1), max(e - f, 0), min(e, 1), 1]
-    kt = sorted(set(round(k, 5) for k in kt))
-    pts = []
-    for k in kt:
-        on = (s + f <= k <= e - f) or (s < k < e)
-        pts.append("1" if on else "0")
+    s, e, f = start / T, min(end, T) / T, fade / T
+    kt = sorted({0.0, max(s, 0.0), min(s + f, 1.0), max(e - f, 0.0), min(e, 1.0), 1.0})
+    vals = ["1" if (s + f <= k <= e - f) else "0" for k in kt]
     if start <= 0.01:
-        pts[0] = "1"
+        vals[0] = "1"
     return (f'<animate attributeName="opacity" dur="{T}s" repeatCount="indefinite" '
-            f'keyTimes="{";".join(str(k) for k in kt)}" values="{";".join(pts)}"/>')
+            f'keyTimes="{";".join(f"{k:.5f}" for k in kt)}" values="{";".join(vals)}"/>')
 
 
 def g(content: str, start: float, end: float) -> str:
@@ -143,142 +193,196 @@ def g(content: str, start: float, end: float) -> str:
     return f'<g opacity="0">{vis(start, end)}{content}</g>'
 
 
-def text(x, y, s, size=13, fill=TEXT, anchor="start", weight="400", extra=""):
-    return (f'<text x="{x}" y="{y}" font-size="{size}" fill="{fill}" '
-            f'text-anchor="{anchor}" font-weight="{weight}" {extra}>{esc(s)}</text>')
+def text(x, y, s, size=13, fill=None, anchor="start", bold=False):
+    fill = fill or TEXT
+    w = ' font-weight="700"' if bold else ""
+    return (f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" fill="{fill}" '
+            f'text-anchor="{anchor}"{w}>{esc(s)}</text>')
 
 
-def wrapped(x, y, s, width, size=13, fill=TEXT, lh=19, max_lines=6):
-    lines = textwrap.wrap(s, width=width)[:max_lines]
-    if len(textwrap.wrap(s, width=width)) > max_lines:
-        lines[-1] = lines[-1].rstrip(".,; ") + "…"
-    return "".join(text(x, y + i * lh, ln, size, fill) for i, ln in enumerate(lines))
+def lines(x, y, rows, size=13, fill=None, lh=19):
+    return "".join(text(x, y + i * lh, r, size, fill) for i, r in enumerate(rows))
 
 
-def prog_w() -> float:
-    if FRAME is None:
-        return 0
-    return max(0.0, min(1.0, (FRAME - 4.6) / 2.0)) * 256
+# -- symbolic icons (16 px, stroked like Adwaita symbolic icons) ------------------
+def icon(kind: str, cx: float, cy: float, color: str = ICON) -> str:
+    x, y = cx - 8, cy - 8
+    st = f'fill="none" stroke="{color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"'
+    if kind == "doc":
+        return (f'<path d="M{x+3} {y+1}h6l4 4v10h-10z M{x+9} {y+1}v4h4" {st}/>'
+                f'<path d="M{x+5.5} {y+9}h5 M{x+5.5} {y+12}h5" {st}/>')
+    if kind == "person":
+        return (f'<circle cx="{cx}" cy="{y+5}" r="3" {st}/>'
+                f'<path d="M{x+2} {y+15}c0-4 3-6 6-6s6 2 6 6" {st}/>')
+    if kind == "topic":
+        return f'<path d="M{x+2} {y+4}h12 M{x+2} {y+8}h12 M{x+2} {y+12}h8" {st}/>'
+    if kind == "answer":
+        return (f'<circle cx="{cx}" cy="{cy}" r="7" {st}/>'
+                f'<path d="M{cx-2} {cy-2}a2 2 0 1 1 2 2v1.5 M{cx} {cy+4}v.1" {st}/>')
+    if kind == "plus":
+        return f'<path d="M{cx} {y+2}v12 M{x+2} {cy}h12" {st}/>'
+    if kind == "menu":
+        return f'<path d="M{x+2} {y+4}h12 M{x+2} {y+8}h12 M{x+2} {y+12}h12" {st}/>'
+    return ""
 
 
-def typed_w(n: int) -> float:
-    if FRAME is None:
-        return 0
-    return max(0.0, min(1.0, (FRAME - 15.4) / 1.8)) * n * 8
+KIND_ICON = {"source": "doc", "entity": "person", "concept": "topic",
+             "topic": "topic", "answer": "answer"}
 
 
 def build(d) -> str:
-    W, H, SB, HH = 900, 560, 280, 48
-    CX = SB + (W - SB) / 2
-    o = []
-    o.append(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
-             f'width="{W}" height="{H}" font-family="{FONT}" role="img" '
-             f'aria-label="gknowledge turns documents into a linked wiki and answers questions with citations">')
-    o.append(f'<rect width="{W}" height="{H}" rx="14" fill="{CONTENT}"/>')
-    o.append(f'<path d="M14 0H{SB}V{H - 44}H0V14A14 14 0 0 1 14 0Z" fill="{SIDEBAR}"/>')
-    o.append(f'<rect x="{SB}" y="0" width="1" height="{H - 44}" fill="{BORDER}"/>')
-    # sidebar header
-    o.append(text(26, 31, "+", 22, ICON, "middle"))
-    o.append(text(SB / 2, 22, d["project"], 13, TEXT, "middle", "700"))
-    o.append(text(SB / 2, 38, "Offline (local heuristics)", 10, DIM, "middle"))
-    o.append(text(SB - 24, 30, "≡", 20, ICON, "middle"))
-    # tabs
-    tabs = [("Sources", 470), ("Knowledge", 570), ("Assistant", 670), ("Review", 760)]
-    spans = [(0.2, 8.5), (8.5, 15.0), (15.0, T), (99, 99)]
-    for (name, x), (a, b) in zip(tabs, spans):
-        o.append(g(f'<rect x="{x - 42}" y="10" width="84" height="30" rx="8" fill="#3a3a3a"/>', a, b))
-        o.append(text(x, 30, name, 13, TEXT, "middle", "700"))
-    # window controls
-    for i, sym in enumerate(("–", "□", "✕")):
-        o.append(f'<circle cx="{W - 70 + i * 28}" cy="25" r="11" fill="#3a3a3a"/>')
-        o.append(text(W - 70 + i * 28, 30, sym, 11, TEXT, "middle"))
+    W, H, SB, HH, CAP = 960, 600, 300, 52, 44
+    BOT = H - CAP                     # bottom of the window body
+    CX = SB + (W - SB - 110) / 2      # tabs centred on content, clear of window buttons
+    X0, XW = SB + 32, W - SB - 64     # content text column
+    o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" '
+         f'height="{H}" font-family="{FONT}" role="img" aria-label="gknowledge turns '
+         f'documents into a linked wiki and answers questions with citations">',
+         f'<rect width="{W}" height="{H}" rx="14" fill="{CONTENT}"/>',
+         f'<path d="M14 0H{SB}V{BOT}H0V14A14 14 0 0 1 14 0Z" fill="{SIDEBAR}"/>',
+         f'<rect x="{SB}" y="0" width="1" height="{BOT}" fill="{BORDER}"/>']
 
-    # ---- scene 1: sources
-    files = d["files"]
-    rows = []
-    for i, name in enumerate(files):
-        y = 72 + i * 46
-        t0 = 1.2 + 0.45 * i
-        row = (f'<circle cx="30" cy="{y - 4}" r="9" fill="none" stroke="{ICON}" stroke-width="1.5"/>'
-               + text(50, y, short(name), 13)
-               + g(text(50, y + 16, "queued", 10, DIM), 0, 7.0)
-               + g(text(50, y + 16, "ingested", 10, DIM), 7.0, 8.5))
-        rows.append(g(row, t0, 8.5))
-    o.append("".join(rows))
-    o.append(g(f'<rect x="12" y="{H - 44 - 60}" width="{SB - 24}" height="36" rx="8" fill="{ACCENT}"/>'
-               + text(SB / 2, H - 44 - 37, "Ingest Queued", 13, TEXT, "middle", "700"), 1.2, 8.5))
-    o.append(g(f'<rect x="12" y="{H - 44 - 78}" width="{SB - 24}" height="6" rx="3" fill="#444"/>'
-               f'<rect x="12" y="{H - 44 - 78}" width="{prog_w()}" height="6" rx="3" fill="{ACCENT}">'
-               + ("" if FRAME is not None else f'<animate attributeName="width" dur="{T}s" repeatCount="indefinite" '
-               f'keyTimes="0;{4.6 / T:.4f};{6.6 / T:.4f};1" values="0;0;{SB - 24};{SB - 24}"/>')
-               + '</rect>', 4.4, 7.2))
-    o.append(g(text(CX, 250, "Drop files here", 20, DIM, "middle", "700")
-               + text(CX, 276, "Markdown, text, PDF, HTML", 13, DIM, "middle"), 0.2, 3.0))
-    o.append(g(text(CX, 240, f"{len(files)} sources ingested", 22, TEXT, "middle", "700")
-               + text(CX, 268, f"{d['n_pages']} pages created, linked and traced to their sources", 14, DIM, "middle"),
-               7.0, 8.5))
+    # sidebar header: + | title/subtitle | menu
+    o.append(icon("plus", 28, HH / 2))
+    o.append(icon("menu", SB - 28, HH / 2))
+    o.append(text(SB / 2, 24, fit(d["project"], 13, SB - 120, True), 13, anchor="middle", bold=True))
+    o.append(text(SB / 2, 40, "Offline (local heuristics)", 10.5, DIM, "middle"))
 
-    # ---- scene 2: knowledge
-    kr = []
+    # tabs (pill behind the active one)
+    names = ["Sources", "Knowledge", "Assistant", "Review"]
+    widths = [text_w(n, 13, True) + 28 for n in names]
+    gap = 6
+    x = CX - (sum(widths) + gap * 3) / 2
+    spans = [(0.0, 9.0), (9.0, 16.5), (16.5, T + 1), (99, 99)]
+    for n, w, (a, b) in zip(names, widths, spans):
+        o.append(g(f'<rect x="{x:.1f}" y="12" width="{w:.1f}" height="30" rx="8" fill="#3a3a3a"/>', a, b))
+        o.append(text(x + w / 2, 32, n, 13, anchor="middle", bold=True))
+        x += w + gap
+    # window buttons
+    for i, kind in enumerate(("min", "max", "close")):
+        cx = W - 84 + i * 30
+        o.append(f'<circle cx="{cx}" cy="{HH / 2}" r="12" fill="#3a3a3a"/>')
+        st = f'fill="none" stroke="{TEXT}" stroke-width="1.4" stroke-linecap="round"'
+        if kind == "min":
+            o.append(f'<path d="M{cx-4} {HH/2+3}h8" {st}/>')
+        elif kind == "max":
+            o.append(f'<rect x="{cx-4}" y="{HH/2-4}" width="8" height="8" rx="1" {st}/>')
+        else:
+            o.append(f'<path d="M{cx-4} {HH/2-4}l8 8M{cx+4} {HH/2-4}l-8 8" {st}/>')
+
+    def row(i, title, sub, kind, badge="", selected=False):
+        y0 = HH + 8 + i * 48
+        out = ""
+        if selected:
+            out += f'<rect x="8" y="{y0}" width="{SB - 16}" height="44" rx="8" fill="{SELECT}"/>'
+        out += icon(KIND_ICON.get(kind, "doc"), 30, y0 + 22)
+        maxw = SB - 52 - (40 if badge else 20)
+        out += text(52, y0 + 19, fit(title, 13, maxw), 13)
+        if sub is not None:
+            out += sub if sub.startswith("<") else text(52, y0 + 35, sub, 10.5, DIM)
+        if badge:
+            out += text(SB - 26, y0 + 26, badge, 10.5, DIM, "middle")
+        return out
+
+    # ---- scene 1: sources (0 - 9 s)
+    for i, name in enumerate(d["files"]):
+        t0 = 1.0 + 0.45 * i
+        y0 = HH + 8 + i * 48
+        sub = (g(text(52, y0 + 35, "queued", 10.5, DIM), 0, 7.0)
+               + g(text(52, y0 + 35, "ingested", 10.5, DIM), 7.0, 9.0))
+        o.append(g(row(i, name, sub, "source"), t0, 9.0))
+    by = BOT - 56
+    o.append(g(f'<rect x="12" y="{by}" width="{SB - 24}" height="38" rx="8" fill="{ACCENT}"/>'
+               + text(SB / 2, by + 24, "Ingest Queued", 13, anchor="middle", bold=True), 1.0, 9.0))
+    pw = SB - 24
+    if FRAME is None:
+        bar = (f'<rect x="12" y="{by - 16}" width="0" height="6" rx="3" fill="{ACCENT}">'
+               f'<animate attributeName="width" dur="{T}s" repeatCount="indefinite" '
+               f'keyTimes="0;{4.6 / T:.4f};{6.8 / T:.4f};1" values="0;0;{pw};{pw}"/></rect>')
+    else:
+        bar = (f'<rect x="12" y="{by - 16}" width="{max(0, min(1, (FRAME - 4.6) / 2.2)) * pw:.1f}" '
+               f'height="6" rx="3" fill="{ACCENT}"/>')
+    o.append(g(f'<rect x="12" y="{by - 16}" width="{pw}" height="6" rx="3" fill="#444"/>' + bar, 4.4, 7.4))
+    mid = SB + (W - SB) / 2
+    o.append(g(f'<g transform="translate({mid} 236) scale(3.2) translate({-mid} -236)">'
+               + icon("doc", mid, 236, DIM).replace('stroke-width="1.5"', 'stroke-width="0.9"') + '</g>'
+               + text(mid, 290, "Drop files here", 20, DIM, "middle", True)
+               + text(mid, 316, "Markdown, text, PDF, HTML", 13, DIM, "middle"), 0.0, 3.6))
+    o.append(g(text(mid, 270, f"{len(d['files'])} sources ingested", 22, anchor="middle", bold=True)
+               + text(mid, 298, f"{d['n_pages']} pages created, linked and traced to their sources",
+                      13.5, DIM, "middle"), 7.2, 9.0))
+
+    # ---- scene 2: knowledge (9 - 16.5 s)
     for i, (title, kind) in enumerate(d["pages"]):
-        y = 72 + i * 46
-        row = ""
-        if i == 0:
-            row += f'<rect x="8" y="{y - 24}" width="{SB - 16}" height="40" rx="8" fill="{SELECT}"/>'
-        row += (f'<circle cx="30" cy="{y - 4}" r="9" fill="none" stroke="{ICON}" stroke-width="1.5"/>'
-                + text(50, y, short(title), 13) + text(50, y + 16, kind, 10, DIM)
-                + text(SB - 24, y, "AI", 10, DIM, "middle"))
-        kr.append(g(row, 8.8 + 0.3 * i, 15.0))
-    o.append("".join(kr))
-    page = [text(310, 100, d["page_title"], 24, TEXT, weight="700"),
-            text(310, 124, f"type: source · generated · from {d['page_file']}", 11, DIM),
-            text(310, 160, "Summary", 14, TEXT, weight="700"),
-            wrapped(310, 182, d["summary"], 78, 12.5, TEXT, 18, 5),
-            text(310, 292, "Key points", 14, TEXT, weight="700")]
-    for i, pt in enumerate(d["points"]):
-        page.append(wrapped(322, 314 + i * 40, "• " + pt, 74, 12.5, TEXT, 18, 2))
-    page.append(text(310, 440, "Related pages", 14, TEXT, weight="700"))
-    for i, nm in enumerate(d["chips"]):
-        x = 310 + i * 160
-        page.append(f'<rect x="{x}" y="452" width="148" height="26" rx="13" fill="#2f4a73"/>'
-                    + text(x + 74, 470, "[[" + nm + "]]", 11, "#cfe0ff", "middle"))
-    o.append(g("".join(page), 9.2, 15.0))
+        o.append(g(row(i, title, kind, kind, "AI", selected=(i == 0)), 9.2 + 0.3 * i, 16.5))
+    y = 104
+    page = [text(X0, y, fit(d["page_title"], 24, XW, True), 24, bold=True),
+            text(X0, y + 24, f"source · generated · from {d['page_file']}", 11, DIM),
+            text(X0, y + 60, "Summary", 14, bold=True)]
+    srows = sentences_fitting(d["summary"], 13, XW, 4)
+    page.append(lines(X0, y + 84, srows, 13))
+    ky = y + 84 + len(srows) * 19 + 26
+    page.append(text(X0, ky, "Key points", 14, bold=True))
+    ky += 24
+    for pt in d["points"]:
+        prow = wrap_px(pt, 13, XW - 16)
+        if len(prow) > 2 or ky + len(prow) * 19 > BOT - 90:
+            continue
+        page.append(text(X0, ky, "•", 13) + lines(X0 + 14, ky, prow, 13))
+        ky += len(prow) * 19 + 6
+    cy = BOT - 58
+    page.append(text(X0, cy, "Related pages", 14, bold=True))
+    cx = X0
+    for nm in d["chips"]:
+        label = f"[[{nm}]]"
+        w = text_w(label, 11.5) + 24
+        page.append(f'<rect x="{cx:.1f}" y="{cy + 12}" width="{w:.1f}" height="26" rx="13" fill="#2f4a73"/>'
+                    + text(cx + w / 2, cy + 29, label, 11.5, "#cfe0ff", "middle"))
+        cx += w + 10
+    o.append(g("".join(page), 9.4, 16.5))
 
-    # ---- scene 3: assistant
-    o.append(g(text(SB / 2, 90, "No saved answers yet.", 13, DIM, "middle"), 15.0, 20.0))
-    saved = (f'<rect x="8" y="48" width="{SB - 16}" height="40" rx="8" fill="{SELECT}"/>'
-             + f'<circle cx="30" cy="68" r="9" fill="none" stroke="{ICON}" stroke-width="1.5"/>'
-             + text(50, 72, QUESTION, 13) + text(50, 88, "saved answer", 10, DIM))
-    o.append(g(saved, 20.2, T))
-    o.append(g(f'<rect x="310" y="{H - 44 - 58}" width="440" height="36" rx="8" fill="#2a2a2a"/>'
-               f'<rect x="760" y="{H - 44 - 58}" width="52" height="36" rx="8" fill="{ACCENT}"/>'
-               + text(786, H - 44 - 35, "Ask", 13, TEXT, "middle", "700")
-               + f'<rect x="820" y="{H - 44 - 58}" width="52" height="36" rx="8" fill="#3a3a3a"/>'
-               + text(846, H - 44 - 35, "Save", 13, TEXT, "middle", "700"), 15.0, T))
-    # typed question
-    n = len(QUESTION)
-    o.append(f'<clipPath id="typed"><rect x="320" y="0" width="{typed_w(n)}" height="{H}">'
-             + ("" if FRAME is not None else f'<animate attributeName="width" dur="{T}s" repeatCount="indefinite" '
-             f'keyTimes="0;{15.4 / T:.4f};{17.2 / T:.4f};1" values="0;0;{n * 8};{n * 8}"/>')
-             + '</rect></clipPath>')
-    o.append(g(f'<g clip-path="url(#typed)">{text(322, H - 44 - 35, QUESTION, 13)}</g>', 15.0, T))
-    ans = [text(310, 90, "Answer", 14, TEXT, weight="700"),
-           wrapped(310, 114, d["answer"], 78, 13, TEXT, 20, 6)]
-    n_lines = min(6, len(textwrap.wrap(d["answer"], width=78)))
-    top = 114 + n_lines * 20 + 22
-    ans.append(text(310, top, "Sources", 14, TEXT, weight="700"))
-    for i, (_num, title, kind) in enumerate(d["cites"]):
-        ans.append(text(310, top + 24 + i * 22, f"[{i + 1}] {title}  ·  {kind}", 12, "#8ab4f8"))
-    o.append(g("".join(ans), 17.6, T))
+    # ---- scene 3: assistant (16.5 s - end)
+    o.append(g(text(SB / 2, HH + 34, "No saved answers yet.", 13, DIM, "middle"), 16.5, 22.5))
+    o.append(g(row(0, QUESTION, "saved answer", "answer", selected=True), 22.5, T + 1))
+    iy = BOT - 58
+    ask_w, save_w = 56, 60
+    entry_w = W - 32 - X0 - ask_w - save_w - 16
+    o.append(g(f'<rect x="{X0}" y="{iy}" width="{entry_w}" height="38" rx="8" fill="#2a2a2a"/>'
+               f'<rect x="{X0 + entry_w + 8}" y="{iy}" width="{ask_w}" height="38" rx="8" fill="{ACCENT}"/>'
+               + text(X0 + entry_w + 8 + ask_w / 2, iy + 24, "Ask", 13, anchor="middle", bold=True)
+               + f'<rect x="{X0 + entry_w + 16 + ask_w}" y="{iy}" width="{save_w}" height="38" rx="8" fill="#3a3a3a"/>'
+               + text(X0 + entry_w + 16 + ask_w + save_w / 2, iy + 24, "Save", 13, anchor="middle", bold=True),
+               16.5, T + 1))
+    qw = text_w(QUESTION, 13) + 4
+    if FRAME is None:
+        clip = (f'<rect x="{X0 + 10}" y="0" width="0" height="{H}">'
+                f'<animate attributeName="width" dur="{T}s" repeatCount="indefinite" '
+                f'keyTimes="0;{17.0 / T:.4f};{19.0 / T:.4f};1" values="0;0;{qw:.0f};{qw:.0f}"/></rect>')
+    else:
+        clip = (f'<rect x="{X0 + 10}" y="0" width="{max(0, min(1, (FRAME - 17) / 2)) * qw:.0f}" '
+                f'height="{H}"/>')
+    o.append(f'<clipPath id="typed">{clip}</clipPath>')
+    o.append(g(f'<g clip-path="url(#typed)">{text(X0 + 12, iy + 24, QUESTION, 13)}</g>', 16.5, T + 1))
+    arows = sentences_fitting(d["answer"], 13.5, XW, 5)
+    ans = [text(X0, 104, "Answer", 14, bold=True), lines(X0, 128, arows, 13.5, lh=21)]
+    sy = 128 + len(arows) * 21 + 26
+    ans.append(text(X0, sy, "Sources", 14, bold=True))
+    for i, (_n, title, kind) in enumerate(d["cites"]):
+        ans.append(text(X0, sy + 24 + i * 22, fit(f"[{i + 1}] {title} · {kind}", 12.5, XW), 12.5, "#8ab4f8"))
+    if d.get("more"):
+        ans.append(text(X0, sy + 24 + len(d["cites"]) * 22, f"+ {d['more']} related pages", 12, DIM))
+    o.append(g("".join(ans), 19.6, T + 1))
 
     # ---- caption bar
-    o.append(f'<path d="M0 {H - 44}H{W}V{H - 14}A14 14 0 0 1 {W - 14} {H}H14A14 14 0 0 1 0 {H - 14}Z" fill="#141414"/>')
-    caps = [(0.2, 8.5, "1  Drop in your documents. Nothing leaves your machine."),
-            (8.5, 15.0, "2  gknowledge builds a linked wiki, as plain Markdown with provenance."),
-            (15.0, T, "3  Ask questions. Every answer cites the pages and sources it used.")]
+    o.append(f'<path d="M0 {BOT}H{W}V{H - 14}A14 14 0 0 1 {W - 14} {H}H14A14 14 0 0 1 0 {H - 14}Z" fill="#141414"/>')
+    right = "native GNOME · offline by default"
+    capw = W - 48 - text_w(right, 11) - 24
+    caps = [(0.0, 9.0, "1  Drop in your papers and notes. Nothing leaves your machine."),
+            (9.0, 16.5, "2  gknowledge builds a linked wiki, as plain Markdown with sources."),
+            (16.5, T + 1, "3  Ask questions. Every answer cites the pages it used.")]
     for a, b, s in caps:
-        o.append(g(text(24, H - 17, s, 14, "#ffffff", weight="700"), a, b))
-    o.append(text(W - 20, H - 17, "native GNOME · offline by default", 11, DIM, "end"))
+        o.append(g(text(24, H - 17, fit(s, 14, capw, True), 14, bold=True), a, b))
+    o.append(text(W - 24, H - 17, right, 11, DIM, "end"))
     o.append("</svg>")
     return "\n".join(o)
 

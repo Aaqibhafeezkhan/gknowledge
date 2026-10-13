@@ -52,7 +52,7 @@ SANDBOX     := sandbox
 DEMO        := $(SANDBOX)/demo
 
 demo-svg:
-	$(PYTHON) build-aux/dev/make_demo_svg.py docs/demo.svg
+	$(PYTHON) build-aux/dev/make_demo_svg.py docs/gknowledge-demo.svg
 
 start:
 	@mkdir -p $(SANDBOX)/config

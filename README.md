@@ -34,7 +34,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/demo.svg" alt="gknowledge in action: drop in AI research papers, get a linked wiki, ask a question and get an answer with citations" width="880">
+  <img src="docs/gknowledge-demo.svg" alt="gknowledge in action: drop in AI research papers, get a linked wiki, ask a question and get an answer with citations" width="880">
 </p>
 
 <p align="center"><sub>

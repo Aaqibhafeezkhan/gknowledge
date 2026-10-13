@@ -146,7 +146,7 @@ Tasks:
 ## Known gaps in the current MVP
 
 - [ ] Offline entity extraction is noisy on prose (for example SAN move fragments such as `Ba4 Nf6`, sentence-initial verbs, generic nouns, `Entity referenced by ingested sources.` boilerplate in answers). Filter chess/move patterns and stopword-led capitalised words, and improve extractive answers.
-- [ ] Demo animation (`docs/demo.svg`) currently shows the offline engine; re-record with an LLM provider once the ChatGPT flow is verified.
+- [ ] Demo animation (`docs/gknowledge-demo.svg`) currently shows the offline engine; re-record with an LLM provider once the ChatGPT flow is verified.
 
 - [ ] No UI for editing or deleting knowledge pages.
 - [ ] Offline heuristics are keyword-based; add language detection beyond English.
