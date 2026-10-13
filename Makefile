@@ -72,6 +72,9 @@ install:
 	printf '#!/bin/sh\nexport PYTHONPATH="%s:$$PYTHONPATH"\nexec %s -m gknowledge "$$@"\n' \
 		"$(LIBDIR)" "$(PYTHON)" > $(DESTDIR)$(BINDIR)/gknowledge
 	chmod +x $(DESTDIR)$(BINDIR)/gknowledge
+	printf '#!/bin/sh\nexport PYTHONPATH="%s:$$PYTHONPATH"\nexec %s -m gknowledge.mcp "$$@"\n' \
+		"$(LIBDIR)" "$(PYTHON)" > $(DESTDIR)$(BINDIR)/gknowledge-mcp
+	chmod +x $(DESTDIR)$(BINDIR)/gknowledge-mcp
 	# Desktop entry, icon and AppStream metadata.
 	$(INSTALL) -d $(DESTDIR)$(APPSDIR)
 	$(INSTALL) -m 644 data/$(APP_ID).desktop $(DESTDIR)$(APPSDIR)/$(APP_ID).desktop
@@ -84,7 +87,7 @@ install:
 	@echo ">> Done. Make sure $(BINDIR) is on your PATH, then run: gknowledge"
 
 uninstall:
-	rm -f  $(DESTDIR)$(BINDIR)/gknowledge
+	rm -f  $(DESTDIR)$(BINDIR)/gknowledge $(DESTDIR)$(BINDIR)/gknowledge-mcp
 	rm -rf $(DESTDIR)$(LIBDIR)
 	rm -f  $(DESTDIR)$(APPSDIR)/$(APP_ID).desktop
 	rm -f  $(DESTDIR)$(ICONDIR)/$(APP_ID).svg

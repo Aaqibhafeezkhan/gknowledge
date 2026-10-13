@@ -133,11 +133,11 @@ Tasks:
 
 ## P2: agent-ready (v0.4)
 
-- [ ] `gknowledge-mcp`: stdio MCP server exposing search, read, list, create, append, ingest.
+- [x] `gknowledge-mcp`: stdio MCP server exposing search_wiki, read_page, list_pages, ask, add_source, recent_activity (v0.2.0).
 - [ ] Write-approval mode: MCP writes land in the review queue, not directly in `knowledge/`.
 - [ ] Optimistic concurrency guard (mtime check) to avoid clobbering concurrent edits.
 - [ ] `AGENTS.md` shipped inside each project describing the wiki schema.
-- [ ] Docs recipes for Claude Code, Cursor, Codex.
+- [x] Docs recipes for Claude Code, Cursor, Codex (README).
 - [ ] Optional `.obsidian/` scaffold and documented vault compatibility.
 
 ## P3: daily driver (v0.5)
@@ -158,6 +158,8 @@ Tasks:
 - [ ] GNOME Circle application when intake reopens.
 
 ## Independent distribution (current priority)
+
+- [ ] Run the launch playbook in `docs/launch/README.md` (Show HN, X, Reddit, TWIG, lists) and upload `docs/launch/social-preview.png` as the repository social preview.
 
 - [x] `build-aux/deb/build-deb.sh` builds a `.deb` with `dpkg-deb`; CI builds and installs it; release workflow attaches it.
 - [x] `build-aux/arch/PKGBUILD` ready for AUR (needs a tag and `updpkgsums`).
