@@ -40,7 +40,7 @@ install_deb() {
   sudo_cmd apt-get install -y "$TMP/gknowledge_all.deb"
   if [ -e "$HOME/.local/bin/gknowledge" ] || [ -e "$HOME/.local/share/applications/io.gknowledge.Gknowledge.desktop" ]; then
     warn "An older gknowledge in ~/.local shadows this install (old icon and version)."
-    warn "Remove it with: rm -rf ~/.local/bin/gknowledge ~/.local/bin/gknowledge-mcp ~/.local/share/gknowledge ~/.local/share/applications/io.gknowledge.Gknowledge.desktop ~/.local/share/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg ~/.local/share/metainfo/io.gknowledge.Gknowledge.metainfo.xml"
+    warn "Remove it with: rm -rf ~/.local/bin/gknowledge ~/.local/bin/gknowledge-mcp ~/.local/share/gknowledge ~/.local/share/applications/io.gknowledge.Gknowledge.desktop ~/.local/share/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg ~/.local/share/metainfo/io.gknowledge.Gknowledge.metainfo.xml && gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor"
   fi
   info "Done. Launch gknowledge from the app grid or run: gknowledge"
 }

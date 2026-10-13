@@ -95,6 +95,11 @@ uninstall:
 	rm -f  $(DESTDIR)$(APPSDIR)/$(APP_ID).desktop
 	rm -f  $(DESTDIR)$(ICONDIR)/$(APP_ID).svg
 	rm -f  $(DESTDIR)$(METAINFODIR)/$(APP_ID).metainfo.xml
+	@# A stale icon cache would still point at the removed icon and leave a blank one.
+	@if [ -z "$(DESTDIR)" ]; then \
+		update-desktop-database $(APPSDIR) 2>/dev/null || true; \
+		gtk-update-icon-cache -f -t $(DATADIR)/icons/hicolor 2>/dev/null || true; \
+	fi
 	@echo ">> Uninstalled gknowledge from $(PREFIX)"
 
 dist:
