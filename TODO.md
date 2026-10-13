@@ -123,7 +123,9 @@ Tasks:
 - [x] `build-aux/deb/build-deb.sh` builds a `.deb` with `dpkg-deb`; CI builds and installs it; release workflow attaches it.
 - [x] `build-aux/arch/PKGBUILD` ready for AUR (needs a tag and `updpkgsums`).
 - [x] `build-aux/snap/snapcraft.yaml` draft (untested).
-- [ ] Cut the first tag `v0.1.0` after local install is verified on Ubuntu 24.04; confirm the release workflow attaches `.deb` and `.flatpak`.
+- [x] First release `v0.1.0` (2026-10-13) with `.deb`, version-independent `gknowledge_all.deb` and `install.sh` (`curl … | bash`).
+- [ ] Fix the Flatpak build: `appstreamcli compose` fails with `file-read-error` on the MetaInfo (the CI job hides it with `continue-on-error`).
+- [ ] Test `sudo apt install ./gknowledge_all.deb` on a clean Ubuntu 24.04 VM.
 - [ ] Publish a signed APT repository on GitHub Pages (reprepro or aptly) and document `curl | gpg --dearmor` setup.
 - [ ] Publish a Flatpak OSTree repo on GitHub Pages with a `.flatpakrepo` file; document `flatpak remote-add`.
 - [ ] Register `gknowledge` on the Snap Store and test the snap on Ubuntu 24.04; decide on `home` plug vs portals.
