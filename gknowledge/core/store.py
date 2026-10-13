@@ -90,12 +90,61 @@ CREATE TABLE IF NOT EXISTS log (
 """
 
 
+class _Rows:
+    """Materialised query result, safe to read after the lock is released."""
+
+    def __init__(self, rows: list):
+        self._rows = rows
+
+    def fetchone(self):
+        return self._rows[0] if self._rows else None
+
+    def fetchall(self) -> list:
+        return list(self._rows)
+
+    def __iter__(self):
+        return iter(self._rows)
+
+
+class _SharedConnection:
+    """One SQLite connection usable from the UI thread and worker threads.
+
+    Ingestion and queries run in background threads; every statement is
+    serialised with a lock and results are fetched while holding it.
+    """
+
+    def __init__(self, path: str):
+        import threading
+        self._lock = threading.RLock()
+        self._conn = sqlite3.connect(path, check_same_thread=False)
+        self._conn.row_factory = sqlite3.Row
+
+    def execute(self, sql: str, params=()) -> _Rows:
+        with self._lock:
+            return _Rows(self._conn.execute(sql, params).fetchall())
+
+    def executemany(self, sql: str, seq) -> None:
+        with self._lock:
+            self._conn.executemany(sql, seq)
+
+    def executescript(self, sql: str) -> None:
+        with self._lock:
+            self._conn.executescript(sql)
+
+    def commit(self) -> None:
+        with self._lock:
+            self._conn.commit()
+
+    def close(self) -> None:
+        with self._lock:
+            self._conn.close()
+
+
 class Store:
     def __init__(self, db_path: str | Path):
         self.path = Path(db_path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(str(self.path))
-        self._conn.row_factory = sqlite3.Row
+        self._conn = _SharedConnection(str(self.path))
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute("PRAGMA foreign_keys=ON")
         self._migrate()

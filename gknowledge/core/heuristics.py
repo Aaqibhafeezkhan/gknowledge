@@ -15,7 +15,7 @@ _WORD_RE = re.compile(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'\-]+")
 _SENT_RE = re.compile(r"(?<=[.!?])\s+(?=[A-ZÀ-Ý])")
 # Sequences of Capitalized Words -> candidate named entities.
 _PROPER_RE = re.compile(
-    r"\b([A-ZÀ-Ý][A-Za-zÀ-ÿ0-9]+(?:[ \t]+(?:of|and|for|the|de|di|van|von|&)?[ \t]*"
+    r"\b([A-ZÀ-Ý][A-Za-zÀ-ÿ0-9]+(?:[ \t]+(?:of|for|the|de|di|van|von)?[ \t]*"
     r"[A-ZÀ-Ý][A-Za-zÀ-ÿ0-9]+){0,3})\b"
 )
 
@@ -57,17 +57,33 @@ def keywords(text: str, limit: int = 12) -> list[str]:
     return [w for w, _ in counts.most_common(limit)]
 
 
+def _sentence_initial(text: str, start: int) -> bool:
+    before = text[:start].rstrip(" \t")
+    return not before or before[-1] in ".!?\n#:" or before.endswith(("- ", "* "))
+
+
 def entities(text: str, limit: int = 10) -> list[str]:
     counts: Counter[str] = Counter()
+    mid_sentence: set[str] = set()
     for m in _PROPER_RE.finditer(text):
         phrase = m.group(1).strip()
         first = phrase.split()[0]
         # Drop phrases that are just a sentence-initial capitalized word.
         if " " not in phrase and first in _SENTENCE_HEADERS:
             continue
+        if not _sentence_initial(text, m.start(1)):
+            mid_sentence.add(phrase)
+        # Chess/algebraic move fragments such as "Ba4 Nf6".
+        if all(re.fullmatch(r"[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8]\+?", w) for w in phrase.split()):
+            continue
         if len(phrase) < 3:
             continue
         counts[phrase] += 1
+    # A single capitalised word seen only at the start of sentences is an
+    # ordinary word ("Because", "Performance"), not a name.
+    for p in list(counts):
+        if " " not in p and p not in mid_sentence:
+            del counts[p]
     ranked = [p for p, c in counts.most_common(limit * 2)]
     # Prefer multi-word or repeated proper nouns.
     ranked.sort(key=lambda p: (" " in p, counts[p]), reverse=True)

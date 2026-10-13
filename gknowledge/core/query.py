@@ -35,6 +35,8 @@ class QueryResult:
     answer: str
     citations: list[Citation] = field(default_factory=list)
     pages: list[Page] = field(default_factory=list)
+    #: Set when the model failed and an extractive answer was used instead.
+    warning: str = ""
 
 
 def _tokens(text: str) -> list[str]:
@@ -87,7 +89,16 @@ class QueryEngine:
         scored = self._score_pages(question)
         seeds = [p for _, p in scored[:top_k]]
         pages = seeds + self._expand(seeds)
-        pages = pages[:top_k]
+        # One citation per distinct page title ("RAG" pages that only differ
+        # by casing or a parenthetical would otherwise be cited three times).
+        from .extraction import canon
+        unique, keys = [], set()
+        for p in pages:
+            key = canon(p.title)
+            if key not in keys:
+                keys.add(key)
+                unique.append(p)
+        pages = unique[:top_k]
 
         citations = [
             Citation(i + 1, p.slug, p.title, p.kind.value)
@@ -100,11 +111,16 @@ class QueryEngine:
             )
 
         context = self._assemble_context(pages)
+        warning = ""
         if self.provider.kind == "llm":
-            answer = self._llm_answer(question, context)
+            try:
+                answer = self._llm_answer(question, context)
+            except ProviderError as exc:
+                warning = f"The model could not answer ({exc}). Showing excerpts instead."
+                answer = self._extractive_answer(pages)
         else:
             answer = self._extractive_answer(pages)
-        return QueryResult(answer=answer, citations=citations, pages=pages)
+        return QueryResult(answer=answer, citations=citations, pages=pages, warning=warning)
 
     def _assemble_context(self, pages: list[Page]) -> str:
         blocks = []
@@ -125,16 +141,14 @@ class QueryEngine:
         lang = self.project.settings.language or "English"
         system = (
             "Answer the question using only the numbered knowledge pages. "
-            f"Cite pages inline as [1], [2]. If unknown, say so. Respond in {lang}."
+            f"Cite pages inline as [1], [2]. If unknown, say so. Use short "
+            f"paragraphs or bullet lists, never tables. Respond in {lang}."
         )
         messages = [
             LLMMessage("system", system),
             LLMMessage("user", f"PAGES:\n{context}\n\nQUESTION: {question}"),
         ]
-        try:
-            return self.provider.complete(messages, temperature=0.2).content
-        except ProviderError as exc:
-            return f"(Provider error: {exc})\n\n" + self._extractive_answer([])
+        return self.provider.complete(messages, temperature=0.2).content
 
     # -- persistence ---------------------------------------------------------
     def save_answer(self, question: str, result: QueryResult) -> Page:

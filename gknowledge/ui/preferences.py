@@ -75,6 +75,14 @@ class PreferencesDialog(Adw.PreferencesWindow):
         self._model.set_text(s.model)
         group.add(self._model)
 
+        # For the ChatGPT plan the model list comes from the signed-in account.
+        self._model_slugs: list[str] = [""]
+        self._model_list = Gtk.StringList.new(["Automatic (recommended)"])
+        self._model_combo = Adw.ComboRow(title="Model", model=self._model_list,
+                                         subtitle="Loaded from your ChatGPT account")
+        group.add(self._model_combo)
+        self._saved_model = s.model if s.provider == "chatgpt" else ""
+
         lang_group = Adw.PreferencesGroup(title="Generation")
         page.add(lang_group)
         self._lang = Adw.ComboRow(title="Language")
@@ -113,7 +121,39 @@ class PreferencesDialog(Adw.PreferencesWindow):
         self._base_url.set_sensitive(not is_offline)
         self._api_key.set_sensitive(not is_offline)
         self._model.set_sensitive(not is_offline)
-        self._model.set_title("Model (optional)" if is_chatgpt else "Model")
+        self._model.set_visible(not is_chatgpt)
+        self._model_combo.set_visible(is_chatgpt)
+        if is_chatgpt and len(self._model_slugs) == 1:
+            self._load_chatgpt_models()
+
+    def _load_chatgpt_models(self):
+        if not self._auth.store.load().sharing:
+            self._model_combo.set_subtitle("Sign in to choose a model")
+            return
+        self._model_combo.set_subtitle("Loading models…")
+
+        def work():
+            from ..providers.chatgpt import ChatGPTPlanProvider
+            try:
+                models = ChatGPTPlanProvider(auth=self._auth).list_models()
+                err = None
+            except Exception as exc:  # noqa: BLE001
+                models, err = [], str(exc)
+            GLib.idle_add(self._fill_models, models, err)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _fill_models(self, models, err):
+        if err:
+            self._model_combo.set_subtitle(f"Could not load models: {err[:80]}")
+            return False
+        self._model_slugs = [""] + [m["slug"] for m in models]
+        names = ["Automatic (recommended)"] + [m.get("display_name") or m["slug"] for m in models]
+        self._model_list.splice(0, self._model_list.get_n_items(), names)
+        if self._saved_model in self._model_slugs:
+            self._model_combo.set_selected(self._model_slugs.index(self._saved_model))
+        self._model_combo.set_subtitle("Models available to your ChatGPT account")
+        return False
 
     # -- ChatGPT sign-in -----------------------------------------------------
     def _refresh_account_row(self, message: str | None = None):
@@ -136,6 +176,9 @@ class PreferencesDialog(Adw.PreferencesWindow):
         if not acct.signed_in:
             self._signin_btn.add_css_class("suggested-action")
         self._signin_btn.set_sensitive(True)
+        if acct.sharing and len(getattr(self, "_model_slugs", [0, 0])) == 1 and \
+                _PROVIDERS[self._provider_row.get_selected()][0] == "chatgpt":
+            self._load_chatgpt_models()
 
     def _on_signin_clicked(self, *_a):
         acct = self._auth.store.load()
@@ -174,7 +217,10 @@ class PreferencesDialog(Adw.PreferencesWindow):
             provider=provider,
             base_url=self._base_url.get_text().strip() or "https://api.openai.com/v1",
             api_key=self._api_key.get_text().strip(),
-            model=self._model.get_text().strip() or ("" if provider == "chatgpt" else "gpt-4o-mini"),
+            model=(self._model_slugs[self._model_combo.get_selected()]
+                   if provider == "chatgpt" and self._model_combo.get_selected() < len(self._model_slugs)
+                   else "" if provider == "chatgpt"
+                   else self._model.get_text().strip() or "gpt-4o-mini"),
             language=_LANGS[self._lang.get_selected()],
         )
         self._cancel.set()

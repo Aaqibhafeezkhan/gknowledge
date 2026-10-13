@@ -146,6 +146,8 @@ class IngestionManager:
             self.store.upsert_job(job)
             _emit(progress, "done", job,
                   f"{source.title}: {len(result.pages)} pages")
+            if result.fallback:
+                _emit(progress, "warning", job, f"{source.title}: {result.fallback}")
         except Exception as exc:  # noqa: BLE001 - surface, don't crash the queue
             source.status = SourceStatus.FAILED
             self.store.upsert_source(source)

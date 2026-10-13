@@ -111,7 +111,11 @@ def collect():
     link_titles = {pg.slug: pg.title for pg in pages.values()}
     import re
     linked = [link_titles[s] for s in re.findall(r"\[\[([^\]|]+)", body) if s in link_titles]
-    chips = [c for c in CONFIG["chips"] if c in pages]
+    aliased = re.findall(r"\[\[[^\]|]+\|([^\]]+)\]\]", body)
+    chips = (aliased or [c for c in CONFIG["chips"] if c in pages])[:3]
+    extra = [x.title for x in pages.values()
+             if x.kind.value == "entity" and x.title not in chosen]
+    chosen = (chosen + extra)[:8]
     titles = [s.title for s in sorted(proj.store.list_sources(), key=lambda s: s.title)]
     return {
         "files": titles,
@@ -314,7 +318,7 @@ def build(d) -> str:
 
     # ---- scene 2: knowledge (9 - 16.5 s)
     for i, (title, kind) in enumerate(d["pages"]):
-        o.append(g(row(i, title, kind, kind, "AI", selected=(i == 0)), 9.2 + 0.3 * i, 16.5))
+        o.append(g(row(i, title, kind, kind, selected=(i == 0)), 9.2 + 0.3 * i, 16.5))
     y = 104
     page = [text(X0, y, fit(d["page_title"], 24, XW, True), 24, bold=True),
             text(X0, y + 24, f"source · generated · from {d['page_file']}", 11, DIM),

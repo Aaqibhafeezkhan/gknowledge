@@ -360,7 +360,8 @@ class ChatGPTPlanProvider(LLMProvider):
         self.api_base = api_base.rstrip("/")
         self.configured_model = model
         self._model: str | None = None
-        self.name = "ChatGPT plan"
+        self.name = (f"ChatGPT plan · {model}" if model
+                     else "ChatGPT plan · automatic model")
 
     def available(self) -> bool:
         return self.auth.store.load().sharing
@@ -396,7 +397,7 @@ class ChatGPTPlanProvider(LLMProvider):
             self._model = slugs[0]
         else:
             raise ProviderError("No ChatGPT models are available for this account.")
-        self.name = f"ChatGPT plan ({self._model})"
+        self.name = f"ChatGPT plan · {self._model}"
         return self._model
 
     # -- completion ----------------------------------------------------------------------

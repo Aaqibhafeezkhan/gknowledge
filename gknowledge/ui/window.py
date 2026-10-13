@@ -8,7 +8,7 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gio, GLib, GObject, Gtk  # noqa: E402
+from gi.repository import Adw, Gio, GLib, GObject, Gtk, Pango  # noqa: E402
 
 from .. import APP_NAME, __version__
 from ..core.ingestion import IngestionManager
@@ -17,7 +17,35 @@ from ..core.models import JobState, PageKind, Source
 from ..core.project import Project
 from ..core.query import QueryEngine
 from ..providers import build_provider
+from .markdown import MarkdownView
 from .preferences import PreferencesDialog
+
+_KIND_ORDER = [PageKind.SOURCE, PageKind.ENTITY, PageKind.CONCEPT, PageKind.TOPIC,
+               PageKind.SYNTHESIS, PageKind.ANSWER]
+_KIND_LABEL = {PageKind.SOURCE: "Sources", PageKind.ENTITY: "People, organisations and works",
+               PageKind.CONCEPT: "Concepts", PageKind.TOPIC: "Topics",
+               PageKind.SYNTHESIS: "Syntheses", PageKind.ANSWER: "Saved answers"}
+
+
+def _kind_header(row, before):
+    page = getattr(row, "page", None)
+    prev = getattr(before, "page", None) if before else None
+    if page and (prev is None or prev.kind != page.kind):
+        label = Gtk.Label(label=_KIND_LABEL.get(page.kind, page.kind.value), xalign=0,
+                          margin_start=12, margin_top=12 if before else 4, margin_bottom=4)
+        label.add_css_class("heading")
+        label.add_css_class("dim-label")
+        row.set_header(label)
+    else:
+        row.set_header(None)
+
+
+def _iter_rows(listbox):
+    child = listbox.get_first_child()
+    while child is not None:
+        yield child
+        child = child.get_next_sibling()
+
 
 _KIND_ICON = {
     PageKind.SOURCE: "text-x-generic-symbolic",
@@ -145,6 +173,9 @@ class MainWindow(Adw.ApplicationWindow):
         content_view = Adw.ToolbarView()
         content_view.add_css_class("gk-content-pane")
         content_view.add_top_bar(header)
+        self.banner = Adw.Banner(revealed=False, button_label="Preferences")
+        self.banner.connect("button-clicked", lambda *_: self.open_preferences())
+        content_view.add_top_bar(self.banner)
         content_view.set_content(self.view_stack)
 
         self.split = Adw.OverlaySplitView(
@@ -180,10 +211,9 @@ class MainWindow(Adw.ApplicationWindow):
         lb.connect("row-activated", handler)
         return lb
 
-    @staticmethod
-    def _detail_area(icon: str, empty_title: str, empty_text: str):
-        """Placeholder until something is selected, then a read-only view."""
-        tv = _make_text_view()
+    def _detail_area(self, icon: str, empty_title: str, empty_text: str):
+        """Placeholder until something is selected, then rendered Markdown."""
+        tv = MarkdownView(on_link=self._open_link, resolve=self._resolve_slug)
         stack = Gtk.Stack()
         stack.add_named(Adw.StatusPage(icon_name=icon, title=empty_title,
                                        description=empty_text), "empty")
@@ -192,9 +222,52 @@ class MainWindow(Adw.ApplicationWindow):
         return stack, tv
 
     @staticmethod
-    def _show_detail(stack: Gtk.Stack, tv: Gtk.TextView, text: str):
-        _set_text(tv, text)
+    def _show_detail(stack: Gtk.Stack, tv, text: str, meta: str = ""):
+        tv.set_markdown(text, meta=meta)
         stack.set_visible_child_name("detail")
+        tv.get_parent().get_vadjustment().set_value(0)
+
+    # -- links -----------------------------------------------------------------
+    def _resolve_slug(self, slug: str) -> str | None:
+        if not self.project:
+            return None
+        page = self.project.store.get_page(slug)
+        return page.title if page else None
+
+    def _open_link(self, target: str):
+        kind, _, value = target.partition(":")
+        if kind == "url":
+            Gtk.UriLauncher.new(value).launch(self, None, None, None)
+            return
+        if kind == "cite":
+            value = self._cite_slugs.get(int(value), "")
+        page = self.project.store.get_page(value) if (self.project and value) else None
+        if not page:
+            self.toast("That page does not exist yet")
+            return
+        self.view_stack.set_visible_child_name("knowledge")
+        self.knowledge_search.set_text("")
+        for row in _iter_rows(self.knowledge_list):
+            if getattr(row, "page", None) and row.page.slug == page.slug:
+                self.knowledge_list.select_row(row)
+                break
+        self._show_page(page)
+
+    def _show_page(self, page):
+        writer = KnowledgeWriter(self.project)
+        body = writer.read_body(page)
+        lines = body.splitlines()
+        if lines and lines[0].lstrip("# ").strip() == page.title:
+            lines = lines[1:]
+        n = len(page.sources)
+        meta = (f"{page.kind.value.capitalize()} · {n} source{'s' if n != 1 else ''}"
+                + (" · generated" if page.generated else ""))
+        backlinks = sorted({l.from_slug for l in self.project.store.all_links()
+                            if l.to_slug == page.slug and l.from_slug != page.slug})
+        text = f"# {page.title}\n" + "\n".join(lines)
+        if backlinks:
+            text += "\n\n## Linked from\n" + "\n".join(f"- [[{s}]]" for s in backlinks)
+        self._show_detail(self.page_stack, self.page_detail, text, meta)
 
     def _add_section(self, name, title, icon, sidebar: Gtk.Widget, content: Gtk.Widget):
         self.side_stack.add_named(sidebar, name)
@@ -308,6 +381,7 @@ class MainWindow(Adw.ApplicationWindow):
         summary = next((p for p in pages if p.kind == PageKind.SOURCE), None)
         if summary:
             body = writer.read_body(summary)
+            body += f"\n\n## Original file\n- [{source.rel_path}](file://{self.project.sources_dir / source.rel_path})"
         else:
             fp = self.project.sources_dir / source.rel_path
             from ..core import parsers
@@ -327,8 +401,23 @@ class MainWindow(Adw.ApplicationWindow):
     # -- knowledge pane ------------------------------------------------------
     def _build_knowledge_pane(self):
         self.knowledge_list = self._sidebar_list(self._on_page_selected)
-        side = Gtk.ScrolledWindow(child=self.knowledge_list, vexpand=True,
-                                  hscrollbar_policy=Gtk.PolicyType.NEVER)
+        self.knowledge_search = Gtk.SearchEntry(placeholder_text="Search pages",
+                                                margin_top=6, margin_bottom=6,
+                                                margin_start=8, margin_end=8)
+        self.knowledge_search.connect(
+            "search-changed", lambda *_: self.knowledge_list.invalidate_filter())
+
+        def matches(row):
+            q = self.knowledge_search.get_text().strip().lower()
+            page = getattr(row, "page", None)
+            return not q or page is None or q in page.title.lower()
+
+        self.knowledge_list.set_filter_func(matches)
+        self.knowledge_list.set_header_func(_kind_header)
+        side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        side.append(self.knowledge_search)
+        side.append(Gtk.ScrolledWindow(child=self.knowledge_list, vexpand=True,
+                                       hscrollbar_policy=Gtk.PolicyType.NEVER))
         self.page_stack, self.page_detail = self._detail_area(
             "emblem-documents-symbolic", "No page selected",
             "Pages generated from your sources appear on the left.")
@@ -343,14 +432,13 @@ class MainWindow(Adw.ApplicationWindow):
             self.knowledge_list.append(
                 _placeholder_row("No knowledge yet. Ingest a source."))
             return
+        order = {k: i for i, k in enumerate(_KIND_ORDER)}
+        pages.sort(key=lambda p: (order.get(p.kind, 99), p.title.lower()))
         for p in pages:
-            row = Adw.ActionRow(title=GLib.markup_escape_text(p.title),
-                                subtitle=p.kind.value)
+            row = Adw.ActionRow(title=GLib.markup_escape_text(p.title), title_lines=1,
+                                tooltip_text=p.title)
             row.add_prefix(Gtk.Image.new_from_icon_name(
                 _KIND_ICON.get(p.kind, "text-x-generic-symbolic")))
-            if p.generated:
-                badge = Gtk.Label(label="AI", css_classes=["dim-label", "caption"])
-                row.add_suffix(badge)
             row.page = p
             self.knowledge_list.append(row)
 
@@ -358,20 +446,21 @@ class MainWindow(Adw.ApplicationWindow):
         page = getattr(row, "page", None)
         if not page or not self.project:
             return
-        writer = KnowledgeWriter(self.project)
-        header = f"# {page.title}\n_type: {page.kind.value} · sources: " \
-                 f"{len(page.sources)} · confidence: {page.confidence}_\n\n"
-        self._show_detail(self.page_stack, self.page_detail,
-                          header + writer.read_body(page))
+        self._show_page(page)
 
     # -- assistant pane ------------------------------------------------------
     def _build_assistant_pane(self):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8,
                       margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
-        self.answer_view = _make_text_view()
+        self._cite_slugs: dict[int, str] = {}
+        self.answer_view = MarkdownView(on_link=self._open_link, resolve=self._resolve_slug)
+        self.answer_view.set_markdown(
+            "## Ask your knowledge base\nQuestions are answered from your wiki, "
+            "and every answer cites the pages it used. Click a citation to open it.")
         box.append(Gtk.ScrolledWindow(child=self.answer_view, vexpand=True))
 
-        self.citations_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        self.citations_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2,
+                                     margin_start=20)
         box.append(self.citations_box)
 
         entry_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
@@ -415,7 +504,8 @@ class MainWindow(Adw.ApplicationWindow):
         if not page or not self.project:
             return
         _clear_box(self.citations_box)
-        _set_text(self.answer_view, KnowledgeWriter(self.project).read_body(page))
+        self._cite_slugs = {i + 1: s for i, s in enumerate(page.links)}
+        self.answer_view.set_markdown(KnowledgeWriter(self.project).read_body(page))
 
     def _on_ask(self, *_a):
         if not self.project:
@@ -423,20 +513,27 @@ class MainWindow(Adw.ApplicationWindow):
         question = self.query_entry.get_text().strip()
         if not question:
             return
-        _set_text(self.answer_view, "Thinking…")
+        self.answer_view.set_markdown(f"## {question}\n*Thinking…*")
         engine = QueryEngine(self.project, self.provider)
 
         def work():
             result = engine.query(question)
 
             def show():
-                _set_text(self.answer_view, result.answer)
+                self._cite_slugs = {c.number: c.slug for c in result.citations}
+                self.answer_view.set_markdown(f"## {question}\n{result.answer}")
                 _clear_box(self.citations_box)
                 for c in result.citations:
-                    lbl = Gtk.Label(
-                        label=f"[{c.number}] {c.title}  ·  {c.kind}",
-                        xalign=0, css_classes=["dim-label", "caption"])
-                    self.citations_box.append(lbl)
+                    lbl = Gtk.Label(label=f"[{c.number}]  {c.title} · {c.kind}", xalign=0,
+                                    ellipsize=Pango.EllipsizeMode.END)
+                    lbl.add_css_class("caption")
+                    btn = Gtk.Button(child=lbl, halign=Gtk.Align.START)
+                    btn.add_css_class("flat")
+                    btn.add_css_class("gk-cite")
+                    btn.connect("clicked", lambda _b, s=c.slug: self._open_link(f"page:{s}"))
+                    self.citations_box.append(btn)
+                if result.warning:
+                    self._warn(result.warning)
                 self._last_query = question
                 self._last_result = result
                 self.save_answer_btn.set_sensitive(bool(result.pages))
@@ -555,6 +652,8 @@ class MainWindow(Adw.ApplicationWindow):
                     self.progress.pulse()
                 elif event == "error":
                     self.toast(f"Failed: {message}")
+                elif event == "warning":
+                    self._warn(f"Model unavailable, used offline extraction for {message}")
                 return False
             GLib.idle_add(update)
 
@@ -570,6 +669,10 @@ class MainWindow(Adw.ApplicationWindow):
         self.ingestion.start(progress=progress, on_finish=finished)
 
     # -- helpers -------------------------------------------------------------
+    def _warn(self, text: str):
+        self.banner.set_title(GLib.markup_escape_text(text[:240]))
+        self.banner.set_revealed(True)
+
     def toast(self, text: str):
         self.toasts.add_toast(Adw.Toast(title=text, timeout=3))
 
