@@ -25,6 +25,26 @@ Actionable backlog derived from [`ROADMAP.md`](ROADMAP.md). Ordered by what unbl
 - [ ] Add a `.doap` file. (CI workflows for tests, metadata validation and Flatpak build exist; Flatpak job is non-blocking until proven.)
 - [ ] Open the `flathub/flathub` submission PR; verify the developer at merge.
 
+## P0b: GNOME and Ubuntu integration (gedit-style)
+
+- [x] Keyboard accelerators for new/open/preferences/quit.
+- [x] Desktop entry advertises Markdown, text, PDF and HTML; files passed by the file manager are imported into the current project.
+- [x] About dialog points to the real repository and issue tracker.
+- [ ] GSettings schema (`io.gknowledge.Gknowledge`): window size, maximized, last project, provider; install and compile it in `make install` and the Flatpak.
+- [ ] Register projects with `Gtk.RecentManager`.
+- [ ] `Gio.Notification` when ingestion finishes or fails.
+- [ ] Drag and drop of files and folders onto the Sources pane.
+- [ ] Primary menu and shortcuts window (`Ctrl+?`); `Adw.ShortcutsDialog` when libadwaita allows.
+- [ ] `gettext` setup: wrap UI strings, `po/`, `POTFILES`, meson or Makefile rules.
+- [ ] D-Bus activation file and `DBusActivatable=true`.
+- [ ] GNOME Shell search provider (`org.gnome.Shell.SearchProvider2`) over the wiki index.
+- [ ] Verify on Ubuntu 24.04 LTS (GNOME 46, libadwaita 1.5, Yaru) and on the current Ubuntu LTS; avoid APIs newer than libadwaita 1.5, or guard them.
+- [ ] Replace `Adw.AboutWindow` with `Adw.AboutDialog` behind a version check.
+- [ ] Debian packaging (`debian/`) and a CI job producing a `.deb`.
+- [ ] Launchpad PPA for `apt install`.
+- [ ] `snapcraft.yaml` using the GNOME extension; test in Ubuntu Software.
+- [ ] Document enabling Flatpak/Flathub on Ubuntu in the README.
+
 ## P1: the "wow" features (v0.3)
 
 ### Graph and structure

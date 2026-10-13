@@ -21,9 +21,10 @@ class GknowledgeApp(Adw.Application):
                          flags=Gio.ApplicationFlags.HANDLES_OPEN)
         self.window: MainWindow | None = None
         self._pending_open: str | None = None
+        self._pending_import: list[str] = []
 
-        self._add_action("new-project", self._on_new_project)
-        self._add_action("open-project", self._on_open_project)
+        self._add_action("new-project", self._on_new_project, "<primary>n")
+        self._add_action("open-project", self._on_open_project, "<primary>o")
         self._add_action("preferences", self._on_preferences, "<primary>comma")
         self._add_action("about", self._on_about)
         self._add_action("quit", self._on_quit, "<primary>q")
@@ -49,12 +50,26 @@ class GknowledgeApp(Adw.Application):
             self._pending_open = None
         else:
             self._maybe_open_last()
+        # Files handed over by the file manager ("Open With") are imported
+        # into the current project, like gedit opening files into a window.
+        if self._pending_import:
+            paths, self._pending_import = self._pending_import, []
+            if self.window.project:
+                self.window._do_import(paths)
+            else:
+                self.window.toast("Open or create a project first, then import the files.")
 
     def do_open(self, files, n_files, hint):
-        # Support `gknowledge /path/to/project`.
-        path = files[0].get_path() if n_files else None
-        if path and Project.is_project(path):
-            self._pending_open = path
+        # `gknowledge /path/to/project` opens a project; other files are
+        # imported as sources into the current (or last used) project.
+        for gfile in files[:n_files]:
+            path = gfile.get_path()
+            if not path:
+                continue
+            if Project.is_project(path):
+                self._pending_open = path
+            elif Path(path).is_file():
+                self._pending_import.append(path)
         self.activate()
 
     def _load_css(self):
@@ -131,7 +146,9 @@ class GknowledgeApp(Adw.Application):
             developer_name="gknowledge contributors",
             comments="A native GNOME knowledge workstation that turns raw "
                      "material into an evolving knowledge base.",
-            website="https://github.com/",
+            website="https://github.com/openapi/gknowledge",
+            issue_url="https://github.com/openapi/gknowledge/issues",
+            copyright="© 2026 gknowledge contributors",
             license_type=Gtk.License.MIT_X11,
         )
         about.present()

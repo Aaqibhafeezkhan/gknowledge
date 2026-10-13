@@ -40,6 +40,37 @@ Why this can win a niche: none of the six comparable open-source projects is on 
 - Mandatory hosted services (Khoj Cloud shut down April 2026). Nothing in gknowledge may require an account.
 - Surprising the user: no silent network use, no edits outside the project folder.
 
+## Design principle: a first-class GNOME citizen, Ubuntu first
+
+gknowledge should behave like the apps that define the platform (gedit / GNOME Text Editor, Files, Evince), not like a cross-platform app that happens to use GTK. Ubuntu is the primary target: the default Ubuntu desktop is GNOME with the Yaru theme, an Ubuntu 24.04 LTS user has GNOME 46 and libadwaita 1.5, and the Ubuntu Software store is Snap-first with Flatpak not preinstalled.
+
+Integration practices we adopt, borrowed from gedit and the core apps:
+
+| Area | Practice | Status |
+|---|---|---|
+| Application model | `Adw.Application`, GActions with accelerators, single instance, command-line files via `HANDLES_OPEN` | Done |
+| File manager | "Open With" for Markdown, text, PDF and HTML imports into the current project (`MimeType=` in the desktop entry) | Done (v0.1.x) |
+| Settings | GSettings schema (window size, last project, provider), readable with dconf and `gsettings` | Planned v0.2 |
+| Recent files | `Gtk.RecentManager` so projects show in the shell and Files "Recent" | Planned v0.2 |
+| Portals | File chooser, notifications, background and open-uri via XDG portals; no broad filesystem access | Partly done |
+| Shell integration | GNOME Shell search provider (search your wiki from the Activities overview), D-Bus activation | Planned v0.4 |
+| Notifications | `Gio.Notification` when long ingestion jobs finish | Planned v0.2 |
+| Keyboard | Standard shortcuts, `Ctrl+?` shortcuts window, `F10` primary menu | Partly done |
+| Drag and drop | Drop files or folders on the Sources pane | Planned v0.2 |
+| Look and feel | libadwaita adaptive layout, dark mode and accent colour, Yaru-compatible icons | Partly done |
+| Accessibility | Orca labels, keyboard-only use, high contrast | Planned v0.6 |
+| i18n | gettext, translatable strings, Weblate/GNOME translation workflow | Planned v0.2 |
+| Help | Yelp help pages or a built-in help dialog | Planned v0.6 |
+| Compatibility | Target libadwaita 1.5 so Ubuntu 24.04 LTS works; adopt newer widgets behind version checks | Rule |
+
+### Ubuntu distribution channels (in addition to Flathub)
+
+Flathub alone under-serves Ubuntu users, so the plan adds:
+1. **`.deb`** built in CI and attached to GitHub Releases, then a **Launchpad PPA** for `apt install`.
+2. **Snap** (`snapcraft.yaml`, GNOME extension) for the Ubuntu Software store.
+3. **Flathub** for every distribution, with a documented one-liner for enabling Flatpak on Ubuntu.
+4. Long term: upstream Debian packaging so the app reaches Ubuntu's `universe` archive.
+
 ## Milestones
 
 ### v0.2 "Launchable" (Oct to Dec 2026)
@@ -47,6 +78,8 @@ Make the project understandable and installable in 60 seconds.
 - Flathub-ready: current GNOME runtime, portals instead of `--filesystem=home`, complete MetaInfo with screenshots, linter clean.
 - README rewritten in the category's language; screenshots, a 60-second demo GIF, and a sample vault that works offline.
 - Opens in Obsidian as-is; documented.
+- GNOME integration basics: GSettings, recent projects, notifications, drag and drop, gettext.
+- `.deb` and Snap packaging prototypes tested on Ubuntu 24.04 LTS.
 - Provider status visible in the UI ("offline" / "Ollama at localhost" / "remote").
 - **Exit:** `flatpak install` works from a local repo; fresh clone to first answer takes under 5 minutes.
 
@@ -64,6 +97,7 @@ The three things people screenshot.
 - **Exit signal:** 100 stars, 500 Flathub installs. Reference points: Reor went 198 to 3,194 stars in ten days after a 411-point Show HN; Tolaria had 318 points.
 
 ### v0.4 "Agent-ready" (Mar to Apr 2027)
+- GNOME Shell search provider and D-Bus activation.
 - Local MCP server (search, read, create, append) with a write-approval mode.
 - Documented recipes for Claude Code, Cursor and Codex.
 - **Exit:** a third-party agent maintains a vault end to end in a recorded demo.
