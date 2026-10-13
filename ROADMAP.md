@@ -104,6 +104,13 @@ Make the project understandable and installable in 60 seconds.
 - Provider status visible in the UI ("offline" / "Ollama at localhost" / "remote").
 - **Exit:** `sudo apt install ./gknowledge_*.deb` and the Flatpak bundle both work on a clean Ubuntu 24.04; fresh clone to first answer takes under 5 minutes.
 
+### Provider track: "Sign in with ChatGPT" (target v0.3, behind a feature flag)
+OpenAI announced at DevDay (2026-09-29) that open-source, locally run apps can let a Plus or Pro user spend their own ChatGPT plan allowance, with no API key and no reseller billing by the app author. Official docs: <https://developers.openai.com/siwc/token-sharing-open-source/sign-in> and the cookbook article <https://developers.openai.com/cookbook/articles/sign-in-with-chatgpt>.
+- New provider `chatgpt_plan`: OAuth 2.0 authorization code + PKCE with a loopback redirect, scope `chatgpt.tokens.use.direct`, calls through the Responses API.
+- UX like a cloud-drive login: one "Sign in with ChatGPT" button in Preferences, "Using ChatGPT plan" indicator, link to ChatGPT usage settings.
+- Offline engine stays the default; no account is ever required.
+- Details and constraints are in `TODO.md` under "ChatGPT plan provider".
+
 ### v0.3 "Wow" (Jan to Feb 2027)
 The three things people screenshot.
 - Interactive knowledge graph view with clusters.

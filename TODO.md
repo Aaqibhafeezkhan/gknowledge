@@ -68,6 +68,28 @@ Actionable backlog derived from [`ROADMAP.md`](ROADMAP.md). Ordered by what unbl
 - [ ] Watch `sources/` and linked folders; reprocess on change (Gio.FileMonitor).
 - [ ] Per-job progress and a visible cancel/retry in the UI (core already supports both).
 
+## ChatGPT plan provider (OpenAI "Sign in with ChatGPT", announced 2026-09-29)
+
+Facts from OpenAI's docs (read 2026-10-13; the program is two weeks old, re-check before building):
+- Open-source and locally run apps are eligible; paid or hosted SaaS must join a waitlist. Only Plus and Pro plans can grant plan usage.
+- Endpoints: authorize `https://auth.openai.com/api/accounts/authorize`, token `https://auth.openai.com/api/accounts/oauth/token`, discovery `https://auth.openai.com/.well-known/openid-configuration`.
+- Public client, no secret. First sign-in uses `client_id=dynamic_agent_client` plus `agent_name_hint` and a stable per-install `ext_agent_host_id`; the callback returns an issued `client_id` that must be saved and reused.
+- PKCE `S256`, fresh `state` and `nonce`, redirect `http://127.0.0.1:<port>/auth/callback` (not `localhost`), same URI in authorize and token requests.
+- Scopes: `openid profile email offline_access resource.invoke chatgpt.tokens.use.direct`, `resource=https://api.openai.com/v1`. Signing in alone does not authorise spending: check the granted scope.
+- Access token 1 hour, refresh token 30 days and rotating. Responses API only, with `store: false`, `stream: true`, no explicit system-role items, no `temperature` or `max_output_tokens`. No image generation, file search, code interpreter or hosted MCP.
+- Users set weekly caps per app in ChatGPT Settings > Usage. Errors: 429 `subscription_sharing_usage_limit_exceeded`, 403 `subscription_sharing_user_not_eligible`. There is no automatic fallback; the app must provide one.
+
+Tasks:
+- [ ] Read the "errors and recovery" and terms pages; confirm that a Python implementation of the raw OAuth flow (no JS DevKit) is allowed.
+- [ ] `gknowledge/providers/chatgpt_plan.py`: OAuth flow (loopback listener, PKCE, id-token verification with JWKS), refresh, Responses API client with streaming.
+- [ ] Open the browser through `Gtk.UriLauncher` (portal-friendly); show a progress and cancel state in Preferences.
+- [ ] Store tokens with libsecret / the Secret portal, never in `settings.json`; delete on sign-out and call the revocation endpoint.
+- [ ] Persist `ext_agent_host_id` and the issued `client_id` per install, in the app config (not in shared project folders).
+- [ ] Adapt the extraction prompts to the Responses API rules (system text goes in `instructions`).
+- [ ] Surface "Using ChatGPT plan", cap-reached and not-eligible states with a "Manage usage" link; fall back to the offline engine automatically.
+- [ ] Tests with a fake OAuth server; no network in CI.
+- [ ] Document the privacy model: documents are sent to OpenAI only when this provider is selected.
+
 ## P2: agent-ready (v0.4)
 
 - [ ] `gknowledge-mcp`: stdio MCP server exposing search, read, list, create, append, ingest.
