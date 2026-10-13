@@ -25,17 +25,24 @@
 
 ## Installazione
 
-Su Ubuntu 24.04+ e Debian 13+ basta una riga (sulle altre distribuzioni installa in `~/.local`):
+Su Ubuntu 24.04+ e Debian 13+ basta una riga: aggiunge il repository APT firmato di gknowledge, così gli aggiornamenti arrivano con `apt upgrade` (sulle altre distribuzioni installa in `~/.local`):
 
 ```bash
 curl -fsSL https://github.com/openapi/gknowledge/releases/latest/download/install.sh | bash
 ```
 
-Oppure scarica il pacchetto `.deb`:
+Oppure aggiungi tu il repository APT:
 
 ```bash
-wget https://github.com/openapi/gknowledge/releases/latest/download/gknowledge_all.deb
-sudo apt install ./gknowledge_all.deb
+sudo curl -fsSLo /usr/share/keyrings/gknowledge.gpg https://openapi.github.io/gknowledge/gknowledge.gpg
+sudo curl -fsSLo /etc/apt/sources.list.d/gknowledge.sources https://openapi.github.io/gknowledge/gknowledge.sources
+sudo apt update && sudo apt install gknowledge
+```
+
+Su qualsiasi distribuzione, con Flatpak (il runtime GNOME arriva da Flathub):
+
+```bash
+flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
 ```
 
 ## Perché gknowledge

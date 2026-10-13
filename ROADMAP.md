@@ -49,8 +49,8 @@ Channels we control, in priority order:
 | # | Channel | Why | Status |
 |---|---|---|---|
 | 1 | **`.deb` on GitHub Releases** | One download for Ubuntu and Debian; built in CI | Script and CI job added |
-| 2 | **Own APT repository** (GitHub Pages) | `apt install` without Launchpad or any store | Planned v0.2 |
-| 3 | **Self-hosted Flatpak remote** (GitHub Pages) | Same sandboxed build as Flathub, no review gate | Planned v0.2 |
+| 2 | **Own APT repository** (GitHub Pages) | `apt install` without Launchpad or any store | Signed repo built in CI after each release; `install.sh` adds it |
+| 3 | **Self-hosted Flatpak remote** (GitHub Pages) | Same sandboxed build as Flathub, no review gate | Signed remote and `.flatpakref` built in CI after each release |
 | 4 | **Snap Store** | Ubuntu Software is Snap-first; separate policy from Flathub | Draft `snapcraft.yaml`, untested |
 | 5 | **Launchpad PPA** | Trusted `add-apt-repository` flow for Ubuntu users | Needs a Launchpad account |
 | 6 | **AUR** | Arch users package it themselves anyway | `PKGBUILD` ready |

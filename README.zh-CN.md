@@ -25,17 +25,24 @@
 
 ## 安装
 
-Ubuntu 24.04+ / Debian 13+ 一行命令安装（其他发行版会安装到 `~/.local`）：
+Ubuntu 24.04+ / Debian 13+ 一行命令安装，会添加已签名的 gknowledge APT 软件源，之后用 `apt upgrade` 即可更新（其他发行版会安装到 `~/.local`）：
 
 ```bash
 curl -fsSL https://github.com/openapi/gknowledge/releases/latest/download/install.sh | bash
 ```
 
-或者下载 deb 包：
+或者手动添加 APT 软件源：
 
 ```bash
-wget https://github.com/openapi/gknowledge/releases/latest/download/gknowledge_all.deb
-sudo apt install ./gknowledge_all.deb
+sudo curl -fsSLo /usr/share/keyrings/gknowledge.gpg https://openapi.github.io/gknowledge/gknowledge.gpg
+sudo curl -fsSLo /etc/apt/sources.list.d/gknowledge.sources https://openapi.github.io/gknowledge/gknowledge.sources
+sudo apt update && sudo apt install gknowledge
+```
+
+任意发行版，使用 Flatpak（GNOME 运行时自动从 Flathub 安装）：
+
+```bash
+flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
 ```
 
 ## 为什么选择 gknowledge

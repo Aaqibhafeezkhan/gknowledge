@@ -48,29 +48,36 @@
 
 ## Install
 
-**One line, on Ubuntu 24.04+ and Debian 13+** (falls back to a per-user install on other distributions):
+**One line, on Ubuntu 24.04+ and Debian 13+.** It adds the signed gknowledge APT repository, so updates arrive with `apt upgrade` (other distributions get a per-user install):
 
 ```bash
 curl -fsSL https://github.com/openapi/gknowledge/releases/latest/download/install.sh | bash
 ```
 
-**Or download the package** and install it with apt, which also pulls GTK 4, Libadwaita and PyGObject:
-
-[![Download .deb](https://img.shields.io/badge/download-gknowledge__all.deb-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://github.com/openapi/gknowledge/releases/latest/download/gknowledge_all.deb)
+**Or add the APT repository yourself.** apt also pulls GTK 4, Libadwaita and PyGObject:
 
 ```bash
-wget https://github.com/openapi/gknowledge/releases/latest/download/gknowledge_all.deb
-sudo apt install ./gknowledge_all.deb
+sudo curl -fsSLo /usr/share/keyrings/gknowledge.gpg https://openapi.github.io/gknowledge/gknowledge.gpg
+sudo curl -fsSLo /etc/apt/sources.list.d/gknowledge.sources https://openapi.github.io/gknowledge/gknowledge.sources
+sudo apt update && sudo apt install gknowledge
 ```
 
-Then open **gknowledge** from the app grid. To remove it: `sudo apt remove gknowledge`.
+**On any distribution, with Flatpak** (the GNOME runtime comes from Flathub):
+
+```bash
+flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
+```
+
+Both repositories are described at [openapi.github.io/gknowledge](https://openapi.github.io/gknowledge).
+
+Then open **gknowledge** from the app grid. To remove it: `sudo apt remove gknowledge` (or `flatpak uninstall io.gknowledge.Gknowledge`).
 
 <details>
 <summary>Other distributions, from source, and release builds</summary>
 
 - **Fedora, Arch and others:** install PyGObject, GTK 4 and Libadwaita with your package manager, then run the one-line installer above. It installs into `~/.local` without root.
 - **From source:** `git clone https://github.com/openapi/gknowledge && cd gknowledge && make install`.
-- **All builds:** every version, including a Flatpak bundle when the build succeeds, is on the [Releases page](https://github.com/openapi/gknowledge/releases).
+- **Single files:** every version's `.deb` and Flatpak bundle is on the [Releases page](https://github.com/openapi/gknowledge/releases), e.g. `sudo apt install ./gknowledge_all.deb` after downloading [gknowledge_all.deb](https://github.com/openapi/gknowledge/releases/latest/download/gknowledge_all.deb).
 
 </details>
 
