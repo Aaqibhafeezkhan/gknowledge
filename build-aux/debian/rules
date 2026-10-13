@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with python3
+
+# The upstream Makefile has no build step; its default target only prints help.
+override_dh_auto_build:
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/gknowledge PREFIX=/usr PYTHON=/usr/bin/python3
+	find debian/gknowledge -name __pycache__ -type d -prune -exec rm -rf {} +
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	python3 tests/test_core.py
+endif
+
+# The package lives in a private directory, not in dist-packages.
+override_dh_python3:
+	dh_python3 /usr/share/gknowledge

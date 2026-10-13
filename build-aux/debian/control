@@ -1,0 +1,33 @@
+Source: gknowledge
+Section: utils
+Maintainer: Francesco Bianco <info.francescobianco@gmail.com>
+Build-Depends: debhelper-compat (= 14),
+               dh-python,
+               python3,
+               python3-pypdf <!nocheck>,
+Standards-Version: 4.7.4
+Homepage: https://github.com/openapi/gknowledge
+Vcs-Browser: https://github.com/openapi/gknowledge
+Vcs-Git: https://github.com/openapi/gknowledge.git
+
+Package: gknowledge
+Architecture: all
+Depends: gir1.2-adw-1,
+         gir1.2-gtk-4.0,
+         python3-gi,
+         ${misc:Depends},
+         ${python3:Depends},
+Recommends: python3-pypdf,
+Description: native GNOME app that turns documents into a cited wiki
+ gknowledge collects documents, notes and links (Markdown, text, PDF,
+ HTML, EPUB) and turns them into a linked Markdown wiki in which every
+ page records its sources. Questions are answered from the wiki with
+ numbered citations that link back to the pages they came from.
+ .
+ The knowledge base is a plain folder of Markdown files with wikilinks
+ and front matter, so it can be opened in other editors or kept in git.
+ .
+ It works fully offline with a built-in heuristic engine. Optionally it
+ can use a local model through Ollama or LM Studio, any OpenAI-compatible
+ endpoint, or the user's own ChatGPT plan. The gknowledge-mcp command
+ exposes the wiki to MCP clients such as coding agents.

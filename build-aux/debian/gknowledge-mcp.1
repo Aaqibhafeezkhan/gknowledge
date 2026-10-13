@@ -1,0 +1,34 @@
+.TH GKNOWLEDGE-MCP 1 "October 2026" "gknowledge 0.2.2" "User Commands"
+.SH NAME
+gknowledge-mcp \- Model Context Protocol server for a gknowledge wiki
+.SH SYNOPSIS
+.B gknowledge-mcp
+.I PROJECT
+.SH DESCRIPTION
+.B gknowledge-mcp
+lets Model Context Protocol clients, such as coding agents, use a
+gknowledge project. It speaks JSON-RPC 2.0 over standard input and
+output and offers the tools search_wiki, read_page, list_pages, ask,
+add_source and recent_activity.
+.PP
+It is normally started by the MCP client, not by hand.
+.SH ARGUMENTS
+.TP
+.I PROJECT
+Path to a gknowledge project folder.
+.SH ENVIRONMENT
+.TP
+.B GKNOWLEDGE_PROJECT
+Project path, used when
+.I PROJECT
+is not given.
+.SH EXAMPLES
+Register the server with Claude Code:
+.PP
+.nf
+.RS
+claude mcp add gknowledge \-\- gknowledge\-mcp ~/Knowledge/my\-project
+.RE
+.fi
+.SH SEE ALSO
+.BR gknowledge (1)
