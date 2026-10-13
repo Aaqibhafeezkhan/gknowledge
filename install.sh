@@ -3,18 +3,22 @@
 #
 #   curl -fsSL https://github.com/openapi/gknowledge/releases/latest/download/install.sh | bash
 #
-# Ubuntu / Debian: downloads the latest .deb and installs it with apt, which
-# also pulls GTK 4, Libadwaita and PyGObject.
+# Ubuntu / Debian: adds the signed gknowledge APT repository and installs from
+# it, so later versions arrive with `apt upgrade`. apt also pulls GTK 4,
+# Libadwaita and PyGObject. If the repository is unreachable, installs the
+# latest .deb from GitHub Releases instead.
 # Other distributions: installs the latest release into ~/.local (no root),
 # after checking that PyGObject, GTK 4 and Libadwaita are present.
 #
 # Environment overrides:
 #   GKNOWLEDGE_REPO   owner/repo (default openapi/gknowledge)
 #   GKNOWLEDGE_MODE   deb | local (default: deb when apt is available)
+#   GKNOWLEDGE_NO_REPO=1  install the release .deb without adding the repository
 set -euo pipefail
 
 REPO="${GKNOWLEDGE_REPO:-openapi/gknowledge}"
 BASE="https://github.com/${REPO}/releases/latest/download"
+PAGES="${GKNOWLEDGE_PAGES:-https://${REPO%%/*}.github.io/${REPO#*/}}"
 
 info() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m!!\033[0m %s\n' "$*" >&2; }
@@ -29,7 +33,24 @@ sudo_cmd() {
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-install_deb() {
+install_repo() {
+  info "Adding the gknowledge APT repository ($PAGES/apt)"
+  curl -fsSL -o "$TMP/gknowledge.gpg" "$PAGES/gknowledge.gpg" || return 1
+  curl -fsSL -o "$TMP/gknowledge.sources" "$PAGES/gknowledge.sources" || return 1
+  grep -q "^URIs: $PAGES/apt$" "$TMP/gknowledge.sources" || return 1
+  sudo_cmd install -m 644 "$TMP/gknowledge.gpg" /usr/share/keyrings/gknowledge.gpg
+  sudo_cmd install -m 644 "$TMP/gknowledge.sources" /etc/apt/sources.list.d/gknowledge.sources
+  info "Installing with apt (you may be asked for your password)"
+  sudo_cmd apt-get update -o Dir::Etc::sourcelist=sources.list.d/gknowledge.sources \
+    -o Dir::Etc::sourceparts=- -o APT::Get::List-Cleanup=0 || {
+    # A broken source would make every later `apt update` fail.
+    sudo_cmd rm -f /etc/apt/sources.list.d/gknowledge.sources /usr/share/keyrings/gknowledge.gpg
+    return 1
+  }
+  sudo_cmd apt-get install -y gknowledge
+}
+
+install_release_deb() {
   info "Downloading the latest gknowledge .deb"
   curl -fL --progress-bar -o "$TMP/gknowledge_all.deb" "$BASE/gknowledge_all.deb" \
     || die "Download failed from $BASE/gknowledge_all.deb"
@@ -38,6 +59,13 @@ install_deb() {
   chmod 644 "$TMP/gknowledge_all.deb"
   info "Installing with apt (you may be asked for your password)"
   sudo_cmd apt-get install -y "$TMP/gknowledge_all.deb"
+}
+
+install_deb() {
+  if [ "${GKNOWLEDGE_NO_REPO:-}" = 1 ] || ! install_repo; then
+    [ "${GKNOWLEDGE_NO_REPO:-}" = 1 ] || warn "The APT repository is not reachable; installing the release .deb (no automatic updates)."
+    install_release_deb
+  fi
   if [ -e "$HOME/.local/bin/gknowledge" ] || [ -e "$HOME/.local/share/applications/io.gknowledge.Gknowledge.desktop" ]; then
     warn "An older gknowledge in ~/.local shadows this install (old icon and version)."
     warn "Remove it with: rm -rf ~/.local/bin/gknowledge ~/.local/bin/gknowledge-mcp ~/.local/share/gknowledge ~/.local/share/applications/io.gknowledge.Gknowledge.desktop ~/.local/share/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg ~/.local/share/metainfo/io.gknowledge.Gknowledge.metainfo.xml && gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor"

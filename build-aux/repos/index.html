@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gknowledge packages</title>
+<link rel="icon" href="io.gknowledge.Gknowledge.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #fafafa; --fg: #1e1e1e; --muted: #5e5e5e; --card: #ffffff; --border: #dedede; --code: #f2f2f2; --accent: #1c71d8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1d1d20; --fg: #f6f5f4; --muted: #b0b0b4; --card: #26262a; --border: #3a3a3f; --code: #303035; --accent: #78aeed; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, "Cantarell", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+  header img { width: 64px; height: 64px; }
+  h1 { font-size: 28px; margin: 0; }
+  h2 { font-size: 19px; margin: 0 0 8px; }
+  p { margin: 0 0 12px; }
+  .lead { color: var(--muted); margin-bottom: 28px; }
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  pre { background: var(--code); border-radius: 8px; padding: 12px; overflow-x: auto; margin: 0 0 12px; font-size: 14px; }
+  code { font-family: ui-monospace, "Source Code Pro", monospace; }
+  a { color: var(--accent); }
+  .note { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="io.gknowledge.Gknowledge.svg" alt="">
+    <h1>gknowledge packages</h1>
+  </header>
+  <p class="lead">Signed package repositories for <a href="https://github.com/openapi/gknowledge">gknowledge</a>, a native GNOME app that turns documents into a cited wiki. Add one once and updates arrive with the rest of your system.</p>
+
+  <section>
+    <h2>Ubuntu and Debian (APT)</h2>
+    <p>Ubuntu 24.04 or later, Debian 13 or later.</p>
+<pre><code>sudo curl -fsSLo /usr/share/keyrings/gknowledge.gpg @BASE_URL@/gknowledge.gpg
+sudo curl -fsSLo /etc/apt/sources.list.d/gknowledge.sources @BASE_URL@/gknowledge.sources
+sudo apt update &amp;&amp; sudo apt install gknowledge</code></pre>
+    <p class="note">To remove the repository: <code>sudo rm /etc/apt/sources.list.d/gknowledge.sources /usr/share/keyrings/gknowledge.gpg</code></p>
+  </section>
+
+  <section>
+    <h2>Any distribution (Flatpak)</h2>
+    <p>The GNOME runtime is installed from Flathub automatically.</p>
+<pre><code>flatpak install --user @BASE_URL@/io.gknowledge.Gknowledge.flatpakref</code></pre>
+    <p class="note">Or add the remote: <code>flatpak remote-add --user --if-not-exists gknowledge @BASE_URL@/gknowledge.flatpakrepo</code></p>
+  </section>
+
+  <section>
+    <h2>Signing key</h2>
+    <p>Both repositories are signed with the same key: <a href="gknowledge.asc">gknowledge.asc</a>.</p>
+    <p class="note">Fingerprint: <code>@FINGERPRINT@</code></p>
+  </section>
+</main>
+</body>
+</html>
