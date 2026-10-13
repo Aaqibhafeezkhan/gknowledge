@@ -7,6 +7,12 @@
 The goal is not to build yet another chat wrapper.
 The goal is to build a serious native app for Linux desktops that makes knowledge curation, synthesis, and retrieval feel like a first-class operating system capability.
 
+<p align="center">
+  <img src="docs/demo.svg" alt="gknowledge in action: drop documents, get a linked wiki, ask questions with citations" width="860">
+</p>
+
+<sub>The animation is generated from the real core on the chess sample documents in `data/demo/chess` (offline engine, no API key). Regenerate it with `make demo-svg`.</sub>
+
 ## gknowledge is an alternative to…
 
 `gknowledge` sits at the intersection of *LLM-powered knowledge bases*, *local-first note tools*, and *document RAG systems*. If you have used any of the tools below, you already understand the shape of the problem — `gknowledge` addresses it as a **native GNOME/GTK application** that is **local-first, provider-agnostic, and usable fully offline** (no API key required, thanks to a built-in heuristic extraction engine).

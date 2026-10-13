@@ -81,13 +81,15 @@ Facts from OpenAI's docs (read 2026-10-13; the program is two weeks old, re-chec
 
 Tasks:
 - [ ] Read the "errors and recovery" and terms pages; confirm that a Python implementation of the raw OAuth flow (no JS DevKit) is allowed.
-- [ ] `gknowledge/providers/chatgpt_plan.py`: OAuth flow (loopback listener, PKCE, id-token verification with JWKS), refresh, Responses API client with streaming.
-- [ ] Open the browser through `Gtk.UriLauncher` (portal-friendly); show a progress and cancel state in Preferences.
-- [ ] Store tokens with libsecret / the Secret portal, never in `settings.json`; delete on sign-out and call the revocation endpoint.
-- [ ] Persist `ext_agent_host_id` and the issued `client_id` per install, in the app config (not in shared project folders).
-- [ ] Adapt the extraction prompts to the Responses API rules (system text goes in `instructions`).
-- [ ] Surface "Using ChatGPT plan", cap-reached and not-eligible states with a "Manage usage" link; fall back to the offline engine automatically.
-- [ ] Tests with a fake OAuth server; no network in CI.
+- [x] `gknowledge/providers/chatgpt.py`: OAuth flow (loopback listener, PKCE, id-token claims check), refresh, revoke, Responses API client with streaming. JWKS signature verification is skipped on purpose (token comes straight from the token endpoint over TLS, OIDC Core 3.1.3.7); add it if a crypto dependency is ever accepted.
+- [x] Open the browser through `Gtk.UriLauncher`; Preferences shows waiting, signed-in and error states. Cancel on dialog save/close is basic.
+- [ ] Move tokens from `~/.config/gknowledge/chatgpt.json` (0600, atomic write, outside projects) to libsecret / the Secret portal. Sign-out already revokes and clears.
+- [x] Persist `ext_agent_host_id` and the issued `client_id` per install, in the app config (not in project folders).
+- [x] Adapt requests to the Responses API rules (system text goes in `instructions`, no temperature, stream, store false).
+- [x] Cap-reached and not-eligible errors are reported; extraction falls back to the offline engine automatically.
+- [ ] Show a persistent "Using ChatGPT plan" indicator in the main window and a "Manage usage" link.
+- [ ] Verify against the real service with a Plus or Pro account (model list, default model, `store: false` behaviour). Only fake servers were tested so far.
+- [x] Tests with fake OAuth and Responses servers (`tests/test_chatgpt.py`); no network in CI.
 - [ ] Document the privacy model: documents are sent to OpenAI only when this provider is selected.
 
 ## P2: agent-ready (v0.4)
@@ -142,6 +144,9 @@ Tasks:
 - [ ] Track installs weekly from the Flathub stats API.
 
 ## Known gaps in the current MVP
+
+- [ ] Offline entity extraction is noisy on prose (for example SAN move fragments such as `Ba4 Nf6`, sentence-initial verbs, generic nouns, `Entity referenced by ingested sources.` boilerplate in answers). Filter chess/move patterns and stopword-led capitalised words, and improve extractive answers.
+- [ ] Demo animation (`docs/demo.svg`) currently shows the offline engine; re-record with an LLM provider once the ChatGPT flow is verified.
 
 - [ ] No UI for editing or deleting knowledge pages.
 - [ ] Offline heuristics are keyword-based; add language detection beyond English.

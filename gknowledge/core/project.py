@@ -44,7 +44,7 @@ KNOWLEDGE_SUBDIRS = {
 
 @dataclass
 class Settings:
-    provider: str = "offline"          # offline | openai | custom | ollama
+    provider: str = "offline"          # offline | chatgpt | openai | custom | ollama
     base_url: str = "https://api.openai.com/v1"
     api_key: str = ""
     model: str = "gpt-4o-mini"

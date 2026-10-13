@@ -6,12 +6,16 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gtk  # noqa: E402
+from gi.repository import Adw, GLib, Gtk  # noqa: E402
+import threading
+
+from ..providers.chatgpt import ChatGPTAuth, SignInError
 
 from ..core.project import Project, Settings
 
 _PROVIDERS = [
     ("offline", "Offline (local heuristics)"),
+    ("chatgpt", "ChatGPT plan (sign in, no API key)"),
     ("openai", "OpenAI"),
     ("custom", "OpenAI-compatible / Custom"),
     ("ollama", "Ollama (local)"),
@@ -46,6 +50,18 @@ class PreferencesDialog(Adw.PreferencesWindow):
         self._provider_row.set_selected(self._provider_index(s.provider))
         self._provider_row.connect("notify::selected", self._on_provider_changed)
         group.add(self._provider_row)
+
+        # ChatGPT account: sign in like linking a cloud drive.
+        self._auth = ChatGPTAuth()
+        self._cancel = threading.Event()
+        self._account_row = Adw.ActionRow(title="ChatGPT account")
+        self._signin_btn = Gtk.Button(label="Sign in with ChatGPT",
+                                      valign=Gtk.Align.CENTER)
+        self._signin_btn.add_css_class("suggested-action")
+        self._signin_btn.connect("clicked", self._on_signin_clicked)
+        self._account_row.add_suffix(self._signin_btn)
+        group.add(self._account_row)
+        self._refresh_account_row()
 
         self._base_url = Adw.EntryRow(title="Base URL")
         self._base_url.set_text(s.base_url)
@@ -89,9 +105,68 @@ class PreferencesDialog(Adw.PreferencesWindow):
         self._sync_sensitivity()
 
     def _sync_sensitivity(self):
-        is_offline = _PROVIDERS[self._provider_row.get_selected()][0] == "offline"
-        for row in (self._base_url, self._api_key, self._model):
-            row.set_sensitive(not is_offline)
+        kind = _PROVIDERS[self._provider_row.get_selected()][0]
+        is_offline, is_chatgpt = kind == "offline", kind == "chatgpt"
+        self._account_row.set_visible(is_chatgpt)
+        self._base_url.set_visible(not is_chatgpt)
+        self._api_key.set_visible(not is_chatgpt)
+        self._base_url.set_sensitive(not is_offline)
+        self._api_key.set_sensitive(not is_offline)
+        self._model.set_sensitive(not is_offline)
+        self._model.set_title("Model (optional)" if is_chatgpt else "Model")
+
+    # -- ChatGPT sign-in -----------------------------------------------------
+    def _refresh_account_row(self, message: str | None = None):
+        acct = self._auth.store.load()
+        if message:
+            self._account_row.set_subtitle(message)
+        elif acct.sharing:
+            who = acct.email or "your account"
+            self._account_row.set_subtitle(
+                f"Signed in as {who}. Usage is charged to your ChatGPT plan "
+                "(limits in ChatGPT Settings, Usage).")
+        elif acct.signed_in:
+            self._account_row.set_subtitle(
+                "Signed in, but plan usage was not allowed. Sign in again.")
+        else:
+            self._account_row.set_subtitle(
+                "Use your own ChatGPT Plus or Pro plan. No API key needed.")
+        self._signin_btn.set_label("Sign out" if acct.signed_in else "Sign in with ChatGPT")
+        self._signin_btn.remove_css_class("suggested-action")
+        if not acct.signed_in:
+            self._signin_btn.add_css_class("suggested-action")
+        self._signin_btn.set_sensitive(True)
+
+    def _on_signin_clicked(self, *_a):
+        acct = self._auth.store.load()
+        self._signin_btn.set_sensitive(False)
+        if acct.signed_in:
+            def out():
+                self._auth.sign_out()
+                GLib.idle_add(self._refresh_account_row)
+            threading.Thread(target=out, daemon=True).start()
+            return
+        self._refresh_account_row("Waiting for your browser…")
+        self._signin_btn.set_sensitive(False)
+        self._cancel.clear()
+
+        def open_url(url):
+            def launch():
+                Gtk.UriLauncher.new(url).launch(self, None, None, None)
+                return False
+            GLib.idle_add(launch)
+
+        def work():
+            try:
+                self._auth.sign_in(open_url, cancel=self._cancel)
+                msg = None
+            except SignInError as exc:
+                msg = str(exc)
+            except Exception as exc:  # noqa: BLE001
+                msg = f"Sign-in failed: {exc}"
+            GLib.idle_add(self._refresh_account_row, msg)
+
+        threading.Thread(target=work, daemon=True).start()
 
     def _on_save(self, *_a):
         provider = _PROVIDERS[self._provider_row.get_selected()][0]
@@ -99,9 +174,10 @@ class PreferencesDialog(Adw.PreferencesWindow):
             provider=provider,
             base_url=self._base_url.get_text().strip() or "https://api.openai.com/v1",
             api_key=self._api_key.get_text().strip(),
-            model=self._model.get_text().strip() or "gpt-4o-mini",
+            model=self._model.get_text().strip() or ("" if provider == "chatgpt" else "gpt-4o-mini"),
             language=_LANGS[self._lang.get_selected()],
         )
+        self._cancel.set()
         self._project.save_settings(settings)
         if self._on_saved:
             self._on_saved(settings)

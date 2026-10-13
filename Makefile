@@ -18,7 +18,7 @@ METAINFODIR := $(DATADIR)/metainfo
 
 INSTALL     := install
 
-.PHONY: all help check test run dev start install uninstall clean dist flatpak
+.PHONY: all help check test run dev start demo-svg install uninstall clean dist flatpak
 
 all: help
 
@@ -50,6 +50,9 @@ dev: run
 # kept in ./sandbox/config so your real settings are never touched.
 SANDBOX     := sandbox
 DEMO        := $(SANDBOX)/demo
+
+demo-svg:
+	$(PYTHON) build-aux/dev/make_demo_svg.py docs/demo.svg
 
 start:
 	@mkdir -p $(SANDBOX)/config

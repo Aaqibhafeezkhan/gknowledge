@@ -9,6 +9,7 @@ project settings at runtime.
 from __future__ import annotations
 
 from .base import LLMMessage, LLMProvider, LLMResponse, ProviderError
+from .chatgpt import ChatGPTPlanProvider
 from .offline import OfflineProvider
 from .openai_compatible import OpenAICompatibleProvider
 
@@ -18,6 +19,8 @@ def build_provider(settings: dict) -> LLMProvider:
     kind = (settings or {}).get("provider", "offline")
     if kind in ("offline", "", None):
         return OfflineProvider()
+    if kind == "chatgpt":
+        return ChatGPTPlanProvider(model=settings.get("model", ""))
     if kind in ("openai", "openai_compatible", "custom", "ollama"):
         return OpenAICompatibleProvider(
             base_url=settings.get("base_url", "https://api.openai.com/v1"),
@@ -34,6 +37,7 @@ __all__ = [
     "LLMResponse",
     "ProviderError",
     "OfflineProvider",
+    "ChatGPTPlanProvider",
     "OpenAICompatibleProvider",
     "build_provider",
 ]
