@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -27,6 +28,32 @@ def make_project(tmp: Path) -> Project:
     proj = Project.create(tmp / "proj", name="Test KB")
     proj.save_settings(Settings(provider="offline"))
     return proj
+
+
+def _write_minimal_epub(path: Path, chapter: str) -> None:
+    """Build the smallest epub a real reader would accept: no binary fixture."""
+    container = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<container version="1.0" '
+        'xmlns="urn:oasis:names:tc:opendocument:xmlns:container">'
+        '<rootfiles><rootfile full-path="OEBPS/content.opf" '
+        'media-type="application/oebps-package+xml"/></rootfiles></container>'
+    )
+    opf = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<package xmlns="http://www.idpf.org/2007/opf" version="3.0">'
+        '<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">'
+        '<dc:title>Smoke Test</dc:title></metadata>'
+        '<manifest><item id="c1" href="chapter1.xhtml" '
+        'media-type="application/xhtml+xml"/></manifest>'
+        '<spine><itemref idref="c1"/></spine></package>'
+    )
+    with zipfile.ZipFile(path, "w") as zf:
+        zf.writestr("mimetype", "application/epub+zip",
+                    compress_type=zipfile.ZIP_STORED)
+        zf.writestr("META-INF/container.xml", container)
+        zf.writestr("OEBPS/content.opf", opf)
+        zf.writestr("OEBPS/chapter1.xhtml", chapter)
 
 
 def test_project_layout(tmp_path):
@@ -94,13 +121,41 @@ def test_query_returns_citations(tmp_path):
     proj.close()
 
 
+def test_import_and_ingest_epub(tmp_path):
+    proj = make_project(tmp_path)
+    epub = tmp_path / "smoke.epub"
+    _write_minimal_epub(epub, """<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 1</title></head>
+<body><h1>Chapter One</h1>
+<p>EPUB smoke test content for the gknowledge test suite. The offline
+extractor only needs a sentence or two of real text to summarize.</p>
+</body></html>""")
+
+    mgr = IngestionManager(proj, build_provider(proj.settings.as_dict()))
+    source = mgr.import_file(epub)
+    assert source is not None
+
+    done = mgr.process_pending()
+    assert done == 1
+
+    source = proj.store.get_source(source.id)
+    assert source.status == SourceStatus.INGESTED
+
+    pages = proj.store.list_pages()
+    source_page = next(p for p in pages if p.kind == PageKind.SOURCE)
+    md = (proj.knowledge_dir / source_page.rel_path).read_text("utf-8")
+    assert "EPUB smoke test content" in md
+    proj.close()
+
+
 if __name__ == "__main__":  # allow running without pytest
     import tempfile
 
     tmp = Path(tempfile.mkdtemp())
     for name, fn in (("a", test_project_layout),
                      ("b", test_import_ingest_and_dedup),
-                     ("c", test_query_returns_citations)):
+                     ("c", test_query_returns_citations),
+                     ("d", test_import_and_ingest_epub)):
         d = tmp / name
         d.mkdir(parents=True, exist_ok=True)
         fn(d)
