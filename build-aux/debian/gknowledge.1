@@ -1,0 +1,31 @@
+.TH GKNOWLEDGE 1 "October 2026" "gknowledge 0.2.2" "User Commands"
+.SH NAME
+gknowledge \- native GNOME app that turns documents into a cited wiki
+.SH SYNOPSIS
+.B gknowledge
+[\fIGTK-OPTIONS\fR]
+.SH DESCRIPTION
+.B gknowledge
+collects documents, notes and links and turns them into a linked
+Markdown wiki in which every page records its sources. Questions are
+answered from the wiki with numbered citations.
+.PP
+A project is a plain folder of Markdown files with wikilinks and front
+matter, plus an SQLite index. It can be opened in other Markdown editors
+or kept under version control.
+.PP
+The app works offline with a built-in engine. A model provider (Ollama,
+LM Studio, any OpenAI-compatible endpoint, or a ChatGPT plan) can be
+chosen in Preferences.
+.SH OPTIONS
+Standard GTK and GApplication options are accepted, for example
+.BR \-\-help .
+.SH FILES
+.TP
+.I $XDG_CONFIG_HOME/gknowledge/
+Recent projects and provider settings (defaults to
+.IR ~/.config/gknowledge/ ).
+.SH SEE ALSO
+.BR gknowledge\-mcp (1)
+.PP
+https://github.com/openapi/gknowledge
