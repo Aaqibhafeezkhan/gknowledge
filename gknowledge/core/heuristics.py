@@ -15,7 +15,7 @@ _WORD_RE = re.compile(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'\-]+")
 _SENT_RE = re.compile(r"(?<=[.!?])\s+(?=[A-ZÀ-Ý])")
 # Sequences of Capitalized Words -> candidate named entities.
 _PROPER_RE = re.compile(
-    r"\b([A-ZÀ-Ý][A-Za-zÀ-ÿ0-9]+(?:\s+(?:of|and|for|the|de|di|van|von|&)?\s*"
+    r"\b([A-ZÀ-Ý][A-Za-zÀ-ÿ0-9]+(?:[ \t]+(?:of|and|for|the|de|di|van|von|&)?[ \t]*"
     r"[A-ZÀ-Ý][A-Za-zÀ-ÿ0-9]+){0,3})\b"
 )
 
