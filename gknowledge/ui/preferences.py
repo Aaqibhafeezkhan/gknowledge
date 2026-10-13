@@ -20,6 +20,21 @@ _PROVIDERS = [
     ("custom", "OpenAI-compatible / Custom"),
     ("ollama", "Ollama (local)"),
 ]
+def _full_width_factory() -> Gtk.SignalListItemFactory:
+    """Item factory whose labels never ellipsize, so long names stay readable."""
+    factory = Gtk.SignalListItemFactory()
+
+    def setup(_f, item):
+        item.set_child(Gtk.Label(xalign=0, ellipsize=0))
+
+    def bind(_f, item):
+        item.get_child().set_label(item.get_item().get_string())
+
+    factory.connect("setup", setup)
+    factory.connect("bind", bind)
+    return factory
+
+
 _LANGS = ["English", "Italiano", "Español", "Français", "Deutsch", "中文"]
 
 
@@ -29,6 +44,8 @@ class PreferencesDialog(Adw.PreferencesWindow):
         self.set_transient_for(parent)
         self.set_modal(True)
         self.set_search_enabled(False)
+        # Wide enough for "ChatGPT plan (sign in, no API key)" without ellipsis.
+        self.set_default_size(720, 640)
         self._project = project
         self._on_saved = on_saved
         s = project.settings
@@ -47,6 +64,8 @@ class PreferencesDialog(Adw.PreferencesWindow):
         for _, label in _PROVIDERS:
             model.append(label)
         self._provider_row.set_model(model)
+        self._provider_row.set_factory(_full_width_factory())
+        self._provider_row.set_list_factory(_full_width_factory())
         self._provider_row.set_selected(self._provider_index(s.provider))
         self._provider_row.connect("notify::selected", self._on_provider_changed)
         group.add(self._provider_row)
@@ -80,6 +99,8 @@ class PreferencesDialog(Adw.PreferencesWindow):
         self._model_list = Gtk.StringList.new(["Automatic (recommended)"])
         self._model_combo = Adw.ComboRow(title="Model", model=self._model_list,
                                          subtitle="Loaded from your ChatGPT account")
+        self._model_combo.set_factory(_full_width_factory())
+        self._model_combo.set_list_factory(_full_width_factory())
         group.add(self._model_combo)
         self._saved_model = s.model if s.provider == "chatgpt" else ""
 
