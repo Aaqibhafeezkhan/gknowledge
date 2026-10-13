@@ -5,6 +5,15 @@ on:
 permissions:
   contents: write
 jobs:
+  deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: build-aux/deb/build-deb.sh dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.deb
+          generate_release_notes: true
   flatpak-bundle:
     runs-on: ubuntu-latest
     steps:

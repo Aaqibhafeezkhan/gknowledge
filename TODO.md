@@ -15,7 +15,7 @@ Actionable backlog derived from [`ROADMAP.md`](ROADMAP.md). Ordered by what unbl
 - [x] Add `CONTRIBUTING.md`, issue and PR templates (Code of Conduct is a section of CONTRIBUTING; `good first issue` label and seeded issues done).
 - [ ] Publish a statement on AI-assisted code (Flathub and GNOME Circle have an AI-code policy since May 2026; this repo is developed with AI assistance and must say so plainly).
 
-### Flatpak and Flathub
+### Flatpak and Flathub (paused: kept warm, do not submit until policy allows AI-assisted code)
 - [ ] Decide the app ID (`io.github.<owner>.Gknowledge` or a verified domain). `io.gknowledge.*` needs a domain we control.
 - [x] Bump the runtime to GNOME 51 (current stable on Flathub). Not yet built in CI.
 - [x] Replace `--filesystem=home` with FileChooser / Documents portals; keep only `--share=network`. Done in the manifest, untested in a real Flatpak build.
@@ -93,6 +93,21 @@ Actionable backlog derived from [`ROADMAP.md`](ROADMAP.md). Ordered by what unbl
 - [ ] Crash-recovery tests for the ingestion queue.
 - [ ] Accessibility audit (Orca, high contrast, large text) and translation setup.
 - [ ] GNOME Circle application when intake reopens.
+
+## Independent distribution (current priority)
+
+- [x] `build-aux/deb/build-deb.sh` builds a `.deb` with `dpkg-deb`; CI builds and installs it; release workflow attaches it.
+- [x] `build-aux/arch/PKGBUILD` ready for AUR (needs a tag and `updpkgsums`).
+- [x] `build-aux/snap/snapcraft.yaml` draft (untested).
+- [ ] Cut the first tag `v0.1.0` after local install is verified on Ubuntu 24.04; confirm the release workflow attaches `.deb` and `.flatpak`.
+- [ ] Publish a signed APT repository on GitHub Pages (reprepro or aptly) and document `curl | gpg --dearmor` setup.
+- [ ] Publish a Flatpak OSTree repo on GitHub Pages with a `.flatpakrepo` file; document `flatpak remote-add`.
+- [ ] Register `gknowledge` on the Snap Store and test the snap on Ubuntu 24.04; decide on `home` plug vs portals.
+- [ ] Create a Launchpad account and PPA; upload a source package (`debian/` with debhelper).
+- [ ] Submit AUR package.
+- [ ] Add Fedora COPR spec and a Nix flake.
+- [ ] Write the launch post (thesis, demo GIF, install one-liners) and the Show HN title.
+- [ ] Draft per-community posts: r/gnome, r/Ubuntu, r/ObsidianMD, r/LocalLLaMA, Mastodon, Planet GNOME feed.
 
 ## Distribution and community
 

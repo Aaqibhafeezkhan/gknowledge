@@ -18,6 +18,15 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y appstream desktop-file-utils
       - run: appstreamcli validate --no-net data/io.gknowledge.Gknowledge.metainfo.xml
       - run: desktop-file-validate data/io.gknowledge.Gknowledge.desktop
+  deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: build-aux/deb/build-deb.sh dist
+      - run: |
+          dpkg-deb -I dist/*.deb
+          sudo apt-get install -y ./dist/*.deb
+          python3 -c "import gknowledge" 2>/dev/null || PYTHONPATH=/usr/share/gknowledge python3 -c "import gknowledge; print(gknowledge.__version__)"
   flatpak:
     runs-on: ubuntu-latest
     continue-on-error: true   # promote to required once the build is proven green

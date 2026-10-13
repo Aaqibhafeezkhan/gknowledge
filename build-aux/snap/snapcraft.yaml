@@ -1,0 +1,31 @@
+# DRAFT, untested. Build with: snapcraft (needs an Ubuntu 24.04 host or LXD).
+name: gknowledge
+base: core24
+adopt-info: gknowledge
+summary: Turn documents into a living wiki
+description: |
+  gknowledge is a native GNOME knowledge workstation. It turns documents,
+  notes and links into an evolving, inspectable Markdown knowledge base with
+  provenance and citations. Works fully offline; OpenAI-compatible endpoints
+  such as Ollama are optional.
+grade: devel
+confinement: strict
+license: MIT
+
+apps:
+  gknowledge:
+    command: usr/bin/gknowledge
+    extensions: [gnome]
+    desktop: usr/share/applications/io.gknowledge.Gknowledge.desktop
+    plugs: [home, network, desktop, wayland, x11, gsettings]
+
+parts:
+  gknowledge:
+    plugin: nil
+    source: ../..
+    source-type: local
+    override-build: |
+      make install DESTDIR="$CRAFT_PART_INSTALL" PREFIX=/usr PYTHON=/usr/bin/python3
+      craftctl set version="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' gknowledge/__init__.py)"
+    build-packages: [make, python3]
+    stage-packages: [python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1]

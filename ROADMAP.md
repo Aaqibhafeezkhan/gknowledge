@@ -40,6 +40,27 @@ Why this can win a niche: none of the six comparable open-source projects is on 
 - Mandatory hosted services (Khoj Cloud shut down April 2026). Nothing in gknowledge may require an account.
 - Surprising the user: no silent network use, no edits outside the project folder.
 
+## Distribution strategy: independent channels first
+
+Flathub and GNOME Circle are deprioritised until their policies on AI-assisted code change (Flathub's policy was tightened in May 2026 and Circle intake has been closed since 2026-05-29). This is a pause, not a rejection: we keep the manifest, MetaInfo and HIG compliance ready so that submission costs little the day the policy allows it.
+
+Channels we control, in priority order:
+
+| # | Channel | Why | Status |
+|---|---|---|---|
+| 1 | **`.deb` on GitHub Releases** | One download for Ubuntu and Debian; built in CI | Script and CI job added |
+| 2 | **Own APT repository** (GitHub Pages) | `apt install` without Launchpad or any store | Planned v0.2 |
+| 3 | **Self-hosted Flatpak remote** (GitHub Pages) | Same sandboxed build as Flathub, no review gate | Planned v0.2 |
+| 4 | **Snap Store** | Ubuntu Software is Snap-first; separate policy from Flathub | Draft `snapcraft.yaml`, untested |
+| 5 | **Launchpad PPA** | Trusted `add-apt-repository` flow for Ubuntu users | Needs a Launchpad account |
+| 6 | **AUR** | Arch users package it themselves anyway | `PKGBUILD` ready |
+| 7 | **Fedora COPR, Nix flake** | Cheap reach | Later |
+| 8 | **PyPI** (`pipx` with system PyGObject) | Developer audience | Later |
+
+Awareness channels do not depend on stores at all: Show HN, Reddit (r/gnome, r/Ubuntu, r/ObsidianMD, r/LocalLLaMA), Mastodon, Planet GNOME (blog syndication), OMG! Ubuntu, 9to5Linux and the Obsidian community, because the vault format is compatible.
+
+Trade-off to accept: no store listing means no search in GNOME Software and lower organic discovery. The launch must therefore rely on the thesis and a demo, not on install-time discovery.
+
 ## Design principle: a first-class GNOME citizen, Ubuntu first
 
 gknowledge should behave like the apps that define the platform (gedit / GNOME Text Editor, Files, Evince), not like a cross-platform app that happens to use GTK. Ubuntu is the primary target: the default Ubuntu desktop is GNOME with the Yaru theme, an Ubuntu 24.04 LTS user has GNOME 46 and libadwaita 1.5, and the Ubuntu Software store is Snap-first with Flatpak not preinstalled.
@@ -75,13 +96,13 @@ Flathub alone under-serves Ubuntu users, so the plan adds:
 
 ### v0.2 "Launchable" (Oct to Dec 2026)
 Make the project understandable and installable in 60 seconds.
-- Flathub-ready: current GNOME runtime, portals instead of `--filesystem=home`, complete MetaInfo with screenshots, linter clean.
+- Flathub-ready (kept warm, not submitted): current GNOME runtime, portals instead of `--filesystem=home`, complete MetaInfo with screenshots, linter clean.
 - README rewritten in the category's language; screenshots, a 60-second demo GIF, and a sample vault that works offline.
 - Opens in Obsidian as-is; documented.
 - GNOME integration basics: GSettings, recent projects, notifications, drag and drop, gettext.
 - `.deb` and Snap packaging prototypes tested on Ubuntu 24.04 LTS.
 - Provider status visible in the UI ("offline" / "Ollama at localhost" / "remote").
-- **Exit:** `flatpak install` works from a local repo; fresh clone to first answer takes under 5 minutes.
+- **Exit:** `sudo apt install ./gknowledge_*.deb` and the Flatpak bundle both work on a clean Ubuntu 24.04; fresh clone to first answer takes under 5 minutes.
 
 ### v0.3 "Wow" (Jan to Feb 2027)
 The three things people screenshot.
@@ -92,7 +113,7 @@ The three things people screenshot.
 - **Exit:** a 30-second GIF of "drop a folder, watch the graph appear".
 
 ### Launch (Feb 2027, same week as v0.3)
-- Flathub listing live and verified.
+- Independent channels live (.deb, own APT and Flatpak repositories, Snap if approved); Flathub if policy allows by then.
 - One item on This Week in GNOME, one Show HN with the thesis in the title, a pre-built Flatpak for everyone.
 - **Exit signal:** 100 stars, 500 Flathub installs. Reference points: Reor went 198 to 3,194 stars in ten days after a 411-point Show HN; Tolaria had 318 points.
 
@@ -110,7 +131,7 @@ The three things people screenshot.
 ### v0.6 and 1.0 (Aug to Dec 2027)
 - Opt-in deep research with explicit consent per query.
 - Accessibility pass, translations, schema migrations, crash recovery tests.
-- GNOME Circle application as soon as intake reopens (closed since 2026-05-29).
+- Revisit Flathub and GNOME Circle when their AI-code policies allow it.
 - **Exit:** two active maintainers, no release gap longer than three months.
 
 ## Non-goals (for now)
@@ -121,7 +142,7 @@ Hosted sync or accounts, a bundled inference runtime, team collaboration, mobile
 | Indicator | Source | 90-day target |
 |---|---|---|
 | GitHub stars | GitHub | 100 |
-| Flathub installs | `flathub.org/api/v2/stats/{app_id}` | 500 |
+| Installs (release downloads, APT hits, Snap stats) | GitHub API, Pages logs, Snap dashboard | 500 |
 | External contributors | GitHub | 3 |
 | Issues from people we do not know | GitHub | 10 |
 | Launch coverage | TWIG, HN, Phoronix | 1 each |
