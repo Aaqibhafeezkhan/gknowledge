@@ -366,20 +366,36 @@ class ChatGPTPlanProvider(LLMProvider):
         return self.auth.store.load().sharing
 
     # -- model resolution --------------------------------------------------------------
+    def list_models(self) -> list[dict]:
+        """Models available to the signed-in account, best first.
+
+        The endpoint returns ``{"models": [{slug, display_name, visibility,
+        priority, ...}]}``; only ``visibility == "list"`` entries are shown.
+        """
+        acct = self.auth.valid_account()
+        data = _http_json(f"{self.api_base}/models",
+                          headers={"Authorization": f"Bearer {acct.access_token}"},
+                          timeout=20)
+        models = [m for m in data.get("models", [])
+                  if m.get("visibility", "list") == "list" and m.get("slug")]
+        if not models:                                   # OpenAI-style fallback
+            models = [{"slug": m["id"], "display_name": m["id"]}
+                      for m in data.get("data", []) if m.get("id")]
+        return sorted(models, key=lambda m: m.get("priority", 999))
+
     def _resolve_model(self, token: str) -> str:
         if self._model:
             return self._model
         try:
-            data = _http_json(f"{self.api_base}/models",
-                              headers={"Authorization": f"Bearer {token}"}, timeout=20)
-            ids = [m.get("id", "") for m in data.get("data", [])]
-        except SignInError:
-            ids = []
-        if self.configured_model and (not ids or self.configured_model in ids):
+            slugs = [m["slug"] for m in self.list_models()]
+        except (ProviderError, KeyError):
+            slugs = []
+        if self.configured_model and (not slugs or self.configured_model in slugs):
             self._model = self.configured_model
+        elif slugs:
+            self._model = slugs[0]
         else:
-            gpt = [i for i in ids if i.startswith("gpt-")]
-            self._model = (gpt or ids or [self.configured_model or "gpt-5"])[0]
+            raise ProviderError("No ChatGPT models are available for this account.")
         self.name = f"ChatGPT plan ({self._model})"
         return self._model
 
@@ -438,7 +454,15 @@ class ChatGPTPlanProvider(LLMProvider):
                         chunks.append(ev.get("delta", ""))
                     elif et == "response.completed":
                         usage = (ev.get("response") or {}).get("usage") or {}
+                    elif et == "response.incomplete":
+                        reason = ((ev.get("response") or {}).get("incomplete_details")
+                                  or {}).get("reason", "unknown")
+                        raise ProviderError(f"ChatGPT returned an incomplete answer ({reason}).")
                     elif et in ("response.failed", "error"):
+                        if "subscription_sharing_usage" in body:
+                            raise ProviderError(
+                                "ChatGPT plan usage is exhausted or unavailable right now "
+                                "(ChatGPT Settings > Usage).")
                         msg = (ev.get("error") or ev.get("response", {}).get("error")
                                or ev)
                         raise ProviderError(f"ChatGPT request failed: {msg}")

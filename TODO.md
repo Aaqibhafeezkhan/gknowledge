@@ -2,6 +2,43 @@
 
 Actionable backlog derived from [`ROADMAP.md`](ROADMAP.md). Ordered by what unblocks the first 100 stars. `[ ]` open, `[x]` done.
 
+## UX review with a real ChatGPT plan (2026-10-13)
+
+Test: 6 short AI-paper notes (about 300 words each), provider "ChatGPT plan", model picked automatically (gpt-6.1-sol).
+Ingest took 102 s (about 17 s per source, serial) and produced 114 pages and 18 review items. Answers were accurate and cited, 7 to 8 s each.
+
+Blocking or misleading
+- [x] Saved model `gpt-4o-mini` is rejected for ChatGPT plans (HTTP 400) and ingest silently fell back to offline heuristics. Fixed: models come from the account's `/models` list (`models[].slug`, `visibility == "list"`).
+- [ ] Tell the user when extraction falls back to heuristics (toast plus a mark on the source); today it is silent.
+- [ ] Preferences: replace the free-text Model field with a dropdown filled from the provider's model list; show the active model in the sidebar subtitle.
+- [ ] "Ingest Queued" looks like an error (orange, disabled) when nothing is queued. Hide it or make it neutral.
+
+Reading the wiki
+- [ ] Render Markdown (headings, bold, lists) instead of showing raw `#`, `**`, `_…_` in a monospace view.
+- [ ] Make `[[wikilinks]]` clickable and navigate to the page; show backlinks.
+- [ ] Group the Knowledge list by type (Sources, Entities, Concepts, Topics), add search, drop the "AI" badge from every row.
+- [ ] Source detail: button to open the original file.
+
+Wiki quality
+- [ ] Too many stub pages: 83 of 114 are one-line entity or concept pages ("Concept discussed in the knowledge base."). Create pages only above a mention threshold, or merge stubs into the source page.
+- [ ] Deduplicate near-identical pages ("Retrieval-Augmented Generation", "Retrieval-Augmented Generation (RAG)", "Chain-of-thought prompting" vs the source page) by normalised title and aliases.
+- [ ] Fix title casing ("Llm wiki", "Bleu").
+- [ ] Deduplicate citations in answers (the same page appeared three times).
+
+Review queue
+- [ ] The 18 items are "open questions" tagged `deep_research`, not things to review. Separate "Questions to explore" from "Needs review", and offer actions (ask, research, dismiss) instead of a single "Resolve".
+- [ ] Review rows wrap badly in the narrow sidebar; show the full item in the content pane with its actions.
+
+Assistant
+- [ ] Stream answers token by token (the provider already streams) instead of "Thinking…" for 8 s.
+- [ ] Empty state with suggested questions generated from the wiki.
+- [ ] Keep a conversation history, not a single answer.
+
+Speed and feedback
+- [ ] Ingest is serial at about 17 s per short source; run 2 to 3 sources in parallel within plan limits and show per-source progress with an estimate.
+- [ ] Add a Cancel button for ingestion (the core already supports cancel).
+- [ ] Re-ingest and delete actions for a source.
+
 ## P0: before any public announcement
 
 ### Repository and positioning
