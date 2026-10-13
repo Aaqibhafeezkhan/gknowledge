@@ -48,8 +48,16 @@
   </categories>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="0.1.0" date="2026-07-07">
-      <description><p>Initial native project shell, ingestion, extraction and query.</p></description>
+    <release version="0.1.0" date="2026-10-13">
+      <description>
+        <p>First public release.</p>
+        <ul>
+          <li>Native GTK 4 and Libadwaita workspace with a Nautilus-style sidebar</li>
+          <li>Offline ingestion, linked Markdown wiki with provenance, cited answers</li>
+          <li>Sign in with ChatGPT to use your own plan, or any OpenAI-compatible endpoint</li>
+          <li>Review queue, demo projects and a .deb package</li>
+        </ul>
+      </description>
     </release>
   </releases>
 </component>

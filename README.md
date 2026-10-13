@@ -22,6 +22,7 @@
   <a href="https://github.com/openapi/gknowledge/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/openapi/gknowledge?style=flat-square&logo=github"></a>
   <a href="https://github.com/openapi/gknowledge/issues"><img alt="Issues" src="https://img.shields.io/github/issues/openapi/gknowledge?style=flat-square"></a>
   <img alt="Last commit" src="https://img.shields.io/github/last-commit/openapi/gknowledge?style=flat-square">
+  <a href="https://github.com/openapi/gknowledge/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/openapi/gknowledge?style=flat-square&color=E95420"></a>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="Offline first" src="https://img.shields.io/badge/offline-first-2ea043?style=flat-square">
   <img alt="No API key needed" src="https://img.shields.io/badge/API%20key-not%20required-2ea043?style=flat-square">
@@ -41,6 +42,34 @@
   Real output of the offline engine on six AI papers (<code>data/demo/papers</code>), no API key.
   Regenerate with <code>make demo-svg</code>.
 </sub></p>
+
+## Install
+
+**One line, on Ubuntu 24.04+ and Debian 13+** (falls back to a per-user install on other distributions):
+
+```bash
+curl -fsSL https://github.com/openapi/gknowledge/releases/latest/download/install.sh | bash
+```
+
+**Or download the package** and install it with apt, which also pulls GTK 4, Libadwaita and PyGObject:
+
+[![Download .deb](https://img.shields.io/badge/download-gknowledge__all.deb-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://github.com/openapi/gknowledge/releases/latest/download/gknowledge_all.deb)
+
+```bash
+wget https://github.com/openapi/gknowledge/releases/latest/download/gknowledge_all.deb
+sudo apt install ./gknowledge_all.deb
+```
+
+Then open **gknowledge** from the app grid. To remove it: `sudo apt remove gknowledge`.
+
+<details>
+<summary>Other distributions, from source, and release builds</summary>
+
+- **Fedora, Arch and others:** install PyGObject, GTK 4 and Libadwaita with your package manager, then run the one-line installer above. It installs into `~/.local` without root.
+- **From source:** `git clone https://github.com/openapi/gknowledge && cd gknowledge && make install`.
+- **All builds:** every version, including a Flatpak bundle when the build succeeds, is on the [Releases page](https://github.com/openapi/gknowledge/releases).
+
+</details>
 
 ## Why gknowledge
 
@@ -66,7 +95,7 @@ If you have used [LLM Wiki](https://github.com/nashsu/llm_wiki), [Tolaria](https
 
 See [`ROADMAP.md`](ROADMAP.md) for dates and [`TODO.md`](TODO.md) for the backlog.
 
-## Quick start
+## Try it from source
 
 ```bash
 sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1   # Ubuntu / Debian

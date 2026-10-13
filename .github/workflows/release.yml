@@ -10,12 +10,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: build-aux/deb/build-deb.sh dist
+      # Version-independent names so /releases/latest/download/<name> always works.
+      - run: |
+          cp dist/gknowledge_*_all.deb dist/gknowledge_all.deb
+          cp install.sh dist/install.sh
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/*.deb
+          files: |
+            dist/gknowledge_*_all.deb
+            dist/gknowledge_all.deb
+            dist/install.sh
+          body_path: build-aux/release-notes.md
           generate_release_notes: true
   flatpak-bundle:
+    needs: deb          # avoid two jobs racing to create the same release
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -28,4 +38,3 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: gknowledge-*.flatpak
-          generate_release_notes: true
