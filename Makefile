@@ -24,7 +24,7 @@ all: help
 
 help:
 	@echo "gknowledge — targets:"
-	@echo "  make start      Run from source on a sandbox project (./sandbox/demo), ready to use"
+	@echo "  make start      Dev loop: run on a demo project and auto-restart on source changes"
 	@echo "  make run        Run the app from the source tree (opens your last project)"
 	@echo "  make test       Run the headless core test suite"
 	@echo "  make check      Byte-compile all sources (syntax check)"
@@ -45,8 +45,8 @@ run:
 
 dev: run
 
-# Launch the app from the source tree on a throwaway demo project so you can
-# see and use it immediately. Config (recent projects, provider settings) is
+# Rapid development loop: launch the app on a throwaway demo project and
+# restart it automatically whenever a file under gknowledge/ changes. Config (recent projects, provider settings) is
 # kept in ./sandbox/config so your real settings are never touched.
 SANDBOX     := sandbox
 DEMO        := $(SANDBOX)/demo
@@ -57,7 +57,7 @@ start:
 		echo ">> Creating and ingesting demo project in $(DEMO)"; \
 		$(PYTHON) build-aux/dev/seed_demo.py $(DEMO); \
 	fi
-	XDG_CONFIG_HOME=$(CURDIR)/$(SANDBOX)/config PYTHONPATH=. $(PYTHON) -m gknowledge $(DEMO)
+	XDG_CONFIG_HOME=$(CURDIR)/$(SANDBOX)/config $(PYTHON) build-aux/dev/watch.py $(DEMO)
 
 install:
 	@echo ">> Installing gknowledge into $(DESTDIR)$(PREFIX)"

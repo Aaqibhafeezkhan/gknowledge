@@ -6,3 +6,15 @@
 .gk-content {
   background: transparent;
 }
+
+/* Nautilus-style sidebar: distinct background, thin separator, no handle. */
+.gk-sidebar {
+  background-color: @sidebar_bg_color;
+  color: @sidebar_fg_color;
+  border-right: 1px solid @sidebar_border_color;
+}
+
+.gk-sidebar list,
+.gk-sidebar row {
+  background: transparent;
+}

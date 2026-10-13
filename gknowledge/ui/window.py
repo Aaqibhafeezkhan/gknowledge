@@ -29,6 +29,19 @@ _KIND_ICON = {
 }
 
 
+def _sidebar_split(list_widget: Gtk.Widget, content: Gtk.Widget, title: str) -> Gtk.Widget:
+    """Nautilus-style layout: a fixed-width, differently coloured sidebar
+    next to the content, with no draggable splitter."""
+    side_scroll = Gtk.ScrolledWindow(child=list_widget, vexpand=True,
+                                     hscrollbar_policy=Gtk.PolicyType.NEVER)
+    side_scroll.add_css_class("gk-sidebar")
+    split = Adw.OverlaySplitView(sidebar=side_scroll, content=content,
+                                 show_sidebar=True, pin_sidebar=True,
+                                 min_sidebar_width=260, max_sidebar_width=340,
+                                 sidebar_width_fraction=0.28)
+    return split
+
+
 class MainWindow(Adw.ApplicationWindow):
     def __init__(self, app: Adw.Application):
         super().__init__(application=app)
@@ -165,16 +178,14 @@ class MainWindow(Adw.ApplicationWindow):
         bar.append(self.progress)
         outer.append(bar)
 
-        paned = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL, vexpand=True,
-                          position=380)
         self.sources_list = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.sources_list.connect("row-activated", self._on_source_selected)
-        left = Gtk.ScrolledWindow(child=self.sources_list, width_request=320)
-        paned.set_start_child(left)
-
         self.source_detail = _make_text_view()
-        paned.set_end_child(Gtk.ScrolledWindow(child=self.source_detail, hexpand=True))
-        outer.append(paned)
+        split = _sidebar_split(
+            self.sources_list, Gtk.ScrolledWindow(child=self.source_detail, hexpand=True),
+            "Sources")
+        split.set_vexpand(True)
+        outer.append(split)
         return outer
 
     def _refresh_sources(self):
@@ -219,15 +230,13 @@ class MainWindow(Adw.ApplicationWindow):
 
     # -- knowledge pane ------------------------------------------------------
     def _build_knowledge_pane(self) -> Gtk.Widget:
-        paned = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL, position=380)
         self.knowledge_list = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.knowledge_list.connect("row-activated", self._on_page_selected)
-        paned.set_start_child(
-            Gtk.ScrolledWindow(child=self.knowledge_list, width_request=320))
         self.page_detail = _make_text_view()
-        paned.set_end_child(
-            Gtk.ScrolledWindow(child=self.page_detail, hexpand=True, vexpand=True))
-        return paned
+        return _sidebar_split(
+            self.knowledge_list,
+            Gtk.ScrolledWindow(child=self.page_detail, hexpand=True, vexpand=True),
+            "Knowledge")
 
     def _refresh_knowledge(self):
         _clear_listbox(self.knowledge_list)
