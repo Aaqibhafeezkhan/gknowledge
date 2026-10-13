@@ -8,7 +8,7 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gio, GLib, GObject, Gtk  # noqa: E402
 
 from .. import APP_NAME, __version__
 from ..core.ingestion import IngestionManager
@@ -29,20 +29,22 @@ _KIND_ICON = {
 }
 
 
-def _sidebar_split(list_widget: Gtk.Widget, content: Gtk.Widget, title: str) -> Gtk.Widget:
-    """Nautilus-style layout: a fixed-width, differently coloured sidebar
-    next to the content, with no draggable splitter."""
-    side_scroll = Gtk.ScrolledWindow(child=list_widget, vexpand=True,
-                                     hscrollbar_policy=Gtk.PolicyType.NEVER)
-    side_scroll.add_css_class("gk-sidebar")
-    split = Adw.OverlaySplitView(sidebar=side_scroll, content=content,
-                                 show_sidebar=True, pin_sidebar=True,
-                                 min_sidebar_width=260, max_sidebar_width=340,
-                                 sidebar_width_fraction=0.28)
-    return split
-
-
 class MainWindow(Adw.ApplicationWindow):
+    """Nautilus-style window.
+
+    A full-height sidebar (own header bar, own controls) sits next to the
+    content pane (own header bar, title centred on the content, not on the
+    window). Sections live in the sidebar; lists push detail pages instead of
+    using a draggable split.
+    """
+
+    SECTIONS = [
+        ("sources", "Sources", "folder-symbolic"),
+        ("knowledge", "Knowledge", "emblem-documents-symbolic"),
+        ("assistant", "Assistant", "user-info-symbolic"),
+        ("review", "Review", "emblem-important-symbolic"),
+    ]
+
     def __init__(self, app: Adw.Application):
         super().__init__(application=app)
         self.app = app
@@ -56,41 +58,31 @@ class MainWindow(Adw.ApplicationWindow):
         self.toasts = Adw.ToastOverlay()
         self.set_content(self.toasts)
 
-        self.toolbar_view = Adw.ToolbarView()
-        self.toasts.set_child(self.toolbar_view)
-
-        self._build_header()
-
         self.main_stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE)
-        self.toolbar_view.set_content(self.main_stack)
-
+        self.toasts.set_child(self.main_stack)
         self.main_stack.add_named(self._build_welcome(), "welcome")
-
-        self.view_stack = Adw.ViewStack()
-        self.main_stack.add_named(self.view_stack, "workspace")
-
+        self.main_stack.add_named(self._build_workspace(), "workspace")
         self.main_stack.set_visible_child_name("welcome")
 
+        self._add_win_action("import-files", self._on_import_files)
+        self._add_win_action("import-folder", self._on_import_folder)
+        self._add_win_action("ingest", self._on_ingest)
+
+    def _add_win_action(self, name, cb):
+        action = Gio.SimpleAction.new(name, None)
+        action.connect("activate", cb)
+        self.add_action(action)
+
     # -- chrome --------------------------------------------------------------
-    def _build_header(self):
-        self.header = Adw.HeaderBar()
-        self.toolbar_view.add_top_bar(self.header)
-
-        self.view_switcher = Adw.ViewSwitcher(policy=Adw.ViewSwitcherPolicy.WIDE)
-        self.header.set_title_widget(self.view_switcher)
-        self.view_switcher.set_visible(False)
-
+    @staticmethod
+    def _primary_menu() -> Gio.Menu:
         menu = Gio.Menu()
         menu.append("New Project…", "app.new-project")
         menu.append("Open Project…", "app.open-project")
         menu.append("Preferences", "app.preferences")
         menu.append("About gknowledge", "app.about")
         menu.append("Quit", "app.quit")
-        menu_btn = Gtk.MenuButton(icon_name="open-menu-symbolic", menu_model=menu)
-        self.header.pack_end(menu_btn)
-
-        self.provider_label = Gtk.Label(css_classes=["dim-label", "caption"])
-        self.header.pack_start(self.provider_label)
+        return menu
 
     def _build_welcome(self) -> Gtk.Widget:
         status = Adw.StatusPage(
@@ -111,7 +103,112 @@ class MainWindow(Adw.ApplicationWindow):
         box.append(new_btn)
         box.append(open_btn)
         status.set_child(box)
-        return status
+
+        view = Adw.ToolbarView()
+        header = Adw.HeaderBar()
+        header.pack_end(Gtk.MenuButton(icon_name="open-menu-symbolic",
+                                       menu_model=self._primary_menu()))
+        view.add_top_bar(header)
+        view.set_content(status)
+        return view
+
+    def _build_workspace(self) -> Gtk.Widget:
+        """Sidebar (full height, own header) + content (own header)."""
+        # Sidebar ---------------------------------------------------------
+        self.sidebar_title = Adw.WindowTitle(title=APP_NAME, subtitle="")
+        side_header = Adw.HeaderBar(show_end_title_buttons=False,
+                                    title_widget=self.sidebar_title)
+        add_menu = Gio.Menu()
+        add_menu.append("Import Files…", "win.import-files")
+        add_menu.append("Import Folder…", "win.import-folder")
+        side_header.pack_start(Gtk.MenuButton(
+            icon_name="list-add-symbolic", menu_model=add_menu,
+            tooltip_text="Add sources"))
+        side_header.pack_end(Gtk.MenuButton(
+            icon_name="open-menu-symbolic", menu_model=self._primary_menu(),
+            primary=True, tooltip_text="Main menu"))
+
+        self.section_list = Gtk.ListBox(css_classes=["navigation-sidebar"],
+                                        selection_mode=Gtk.SelectionMode.BROWSE)
+        self.section_list.connect("row-selected", self._on_section_selected)
+        self._count_labels = {}
+        for name, title, icon in self.SECTIONS:
+            self.section_list.append(self._section_row(name, title, icon))
+
+        side_view = Adw.ToolbarView()
+        side_view.add_top_bar(side_header)
+        side_view.set_content(Gtk.ScrolledWindow(
+            child=self.section_list, vexpand=True,
+            hscrollbar_policy=Gtk.PolicyType.NEVER))
+
+        # Content ---------------------------------------------------------
+        self.section_stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE)
+
+        self.split = Adw.OverlaySplitView(
+            sidebar=side_view, content=self.section_stack,
+            show_sidebar=True, pin_sidebar=False,
+            min_sidebar_width=210, max_sidebar_width=300,
+            sidebar_width_fraction=0.22)
+        try:
+            bp = Adw.Breakpoint.new(Adw.BreakpointCondition.parse("max-width: 640sp"))
+            bp.add_setter(self.split, "collapsed", True)
+            self.add_breakpoint(bp)
+        except Exception:  # noqa: BLE001  (older libadwaita)
+            pass
+        return self.split
+
+    def _section_row(self, name, title, icon) -> Gtk.ListBoxRow:
+        box = Gtk.Box(spacing=12, margin_top=8, margin_bottom=8,
+                      margin_start=6, margin_end=6)
+        box.append(Gtk.Image.new_from_icon_name(icon))
+        box.append(Gtk.Label(label=title, xalign=0, hexpand=True))
+        count = Gtk.Label(label="", css_classes=["dim-label", "numeric"])
+        box.append(count)
+        self._count_labels[name] = count
+        row = Gtk.ListBoxRow(child=box)
+        row.section = name
+        return row
+
+    def _on_section_selected(self, _list, row):
+        if row is None:
+            return
+        if self.section_stack.get_child_by_name(row.section):
+            self.section_stack.set_visible_child_name(row.section)
+        if self.split.get_collapsed():
+            self.split.set_show_sidebar(False)
+
+    def _section_page(self, title: str, child: Gtk.Widget, *, start=(), end=(),
+                      with_toggle=True) -> Gtk.Widget:
+        """A content page with its own header; title centred on the content."""
+        view = Adw.ToolbarView()
+        header = Adw.HeaderBar(show_start_title_buttons=False,
+                               title_widget=Adw.WindowTitle(
+                                   title=title,
+                                   subtitle=self.project.name if self.project else ""))
+        if with_toggle:
+            toggle = Gtk.ToggleButton(icon_name="sidebar-show-symbolic",
+                                      tooltip_text="Toggle sidebar")
+            self.split.bind_property("collapsed", toggle, "visible",
+                                     GObject.BindingFlags.SYNC_CREATE)
+            self.split.bind_property("show-sidebar", toggle, "active",
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.BIDIRECTIONAL)
+            header.pack_start(toggle)
+        for w in start:
+            header.pack_start(w)
+        for w in end:
+            header.pack_end(w)
+        view.add_top_bar(header)
+        view.set_content(child)
+        return view
+
+    def _detail_page(self, title: str, body: str) -> Adw.NavigationPage:
+        tv = _make_text_view()
+        _set_text(tv, body)
+        view = Adw.ToolbarView()
+        view.add_top_bar(Adw.HeaderBar())
+        view.set_content(Gtk.ScrolledWindow(child=tv, vexpand=True, hexpand=True))
+        return Adw.NavigationPage(child=view, title=title)
 
     # -- project lifecycle ---------------------------------------------------
     def set_project(self, project: Project):
@@ -121,26 +218,19 @@ class MainWindow(Adw.ApplicationWindow):
         self.provider = build_provider(project.settings.as_dict())
         self.ingestion = IngestionManager(project, self.provider)
 
-        # Reset the workspace stack.
-        while (child := self.view_stack.get_first_child()) is not None:
-            self.view_stack.remove(child)
+        while (child := self.section_stack.get_first_child()) is not None:
+            self.section_stack.remove(child)
 
-        self.view_stack.add_titled_with_icon(
-            self._build_sources_pane(), "sources", "Sources", "folder-symbolic")
-        self.view_stack.add_titled_with_icon(
-            self._build_knowledge_pane(), "knowledge", "Knowledge",
-            "emblem-documents-symbolic")
-        self.view_stack.add_titled_with_icon(
-            self._build_assistant_pane(), "assistant", "Assistant",
-            "user-info-symbolic")
-        self.view_stack.add_titled_with_icon(
-            self._build_review_pane(), "review", "Review", "emblem-important-symbolic")
+        self.section_stack.add_named(self._build_sources_pane(), "sources")
+        self.section_stack.add_named(self._build_knowledge_pane(), "knowledge")
+        self.section_stack.add_named(self._build_assistant_pane(), "assistant")
+        self.section_stack.add_named(self._build_review_pane(), "review")
 
-        self.view_switcher.set_stack(self.view_stack)
-        self.view_switcher.set_visible(True)
         self.set_title(f"{project.name} — {APP_NAME}")
-        self.provider_label.set_text(self.provider.name)
+        self.sidebar_title.set_title(project.name)
+        self.sidebar_title.set_subtitle(self.provider.name)
         self.main_stack.set_visible_child_name("workspace")
+        self.section_list.select_row(self.section_list.get_row_at_index(0))
 
         self.refresh_all()
 
@@ -148,45 +238,49 @@ class MainWindow(Adw.ApplicationWindow):
         if self.project:
             self.provider = build_provider(settings.as_dict())
             self.ingestion.set_provider(self.provider)
-            self.provider_label.set_text(self.provider.name)
+            self.sidebar_title.set_subtitle(self.provider.name)
             self.toast("Provider updated")
 
     def refresh_all(self):
         self._refresh_sources()
         self._refresh_knowledge()
         self._refresh_reviews()
+        self._update_counts()
+
+    def _update_counts(self):
+        if not self.project:
+            return
+        store = self.project.store
+        counts = {"sources": len(store.list_sources()),
+                  "knowledge": len(store.list_pages()),
+                  "review": len(store.list_reviews(status="open"))}
+        for name, n in counts.items():
+            self._count_labels[name].set_text(str(n) if n else "")
 
     # -- sources pane --------------------------------------------------------
     def _build_sources_pane(self) -> Gtk.Widget:
-        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-
-        bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6,
-                      margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
-        import_files = Gtk.Button(label="Import Files…", icon_name="document-open-symbolic")
-        import_files.connect("clicked", self._on_import_files)
-        import_folder = Gtk.Button(label="Import Folder…", icon_name="folder-open-symbolic")
-        import_folder.connect("clicked", self._on_import_folder)
         self.ingest_btn = Gtk.Button(label="Ingest Queued")
         self.ingest_btn.add_css_class("suggested-action")
-        self.ingest_btn.connect("clicked", self._on_ingest)
-        bar.append(import_files)
-        bar.append(import_folder)
-        bar.append(self.ingest_btn)
+        self.ingest_btn.set_action_name("win.ingest")
 
-        self.progress = Gtk.ProgressBar(hexpand=True, valign=Gtk.Align.CENTER,
-                                        show_text=True, visible=False)
-        bar.append(self.progress)
-        outer.append(bar)
-
-        self.sources_list = Gtk.ListBox(css_classes=["navigation-sidebar"])
+        self.progress = Gtk.ProgressBar(show_text=True, visible=False,
+                                        margin_top=8, margin_bottom=8,
+                                        margin_start=12, margin_end=12)
+        self.sources_list = Gtk.ListBox(css_classes=["boxed-list"],
+                                        selection_mode=Gtk.SelectionMode.NONE,
+                                        margin_top=12, margin_bottom=12,
+                                        margin_start=12, margin_end=12)
         self.sources_list.connect("row-activated", self._on_source_selected)
-        self.source_detail = _make_text_view()
-        split = _sidebar_split(
-            self.sources_list, Gtk.ScrolledWindow(child=self.source_detail, hexpand=True),
-            "Sources")
-        split.set_vexpand(True)
-        outer.append(split)
-        return outer
+        body = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        body.append(self.progress)
+        body.append(Gtk.ScrolledWindow(child=self.sources_list, vexpand=True))
+
+        root = Adw.NavigationPage(
+            child=self._section_page("Sources", body, end=[self.ingest_btn]),
+            title="Sources")
+        self.sources_nav = Adw.NavigationView()
+        self.sources_nav.add(root)
+        return self.sources_nav
 
     def _refresh_sources(self):
         _clear_listbox(self.sources_list)
@@ -211,13 +305,13 @@ class MainWindow(Adw.ApplicationWindow):
         writer = KnowledgeWriter(self.project)
         summary = next((p for p in pages if p.kind == PageKind.SOURCE), None)
         if summary:
-            _set_text(self.source_detail, writer.read_body(summary))
+            body = writer.read_body(summary)
         else:
             fp = self.project.sources_dir / source.rel_path
             from ..core import parsers
-            _set_text(self.source_detail,
-                      f"# {source.title}\n\n(Not yet ingested.)\n\n"
-                      + parsers.parse(fp)[:4000])
+            body = (f"# {source.title}\n\n(Not yet ingested.)\n\n"
+                    + parsers.parse(fp)[:4000])
+        self.sources_nav.push(self._detail_page(source.title, body))
 
     def _update_ingest_button(self):
         if not self.project:
@@ -230,13 +324,18 @@ class MainWindow(Adw.ApplicationWindow):
 
     # -- knowledge pane ------------------------------------------------------
     def _build_knowledge_pane(self) -> Gtk.Widget:
-        self.knowledge_list = Gtk.ListBox(css_classes=["navigation-sidebar"])
+        self.knowledge_list = Gtk.ListBox(css_classes=["boxed-list"],
+                                          selection_mode=Gtk.SelectionMode.NONE,
+                                          margin_top=12, margin_bottom=12,
+                                          margin_start=12, margin_end=12)
         self.knowledge_list.connect("row-activated", self._on_page_selected)
-        self.page_detail = _make_text_view()
-        return _sidebar_split(
-            self.knowledge_list,
-            Gtk.ScrolledWindow(child=self.page_detail, hexpand=True, vexpand=True),
-            "Knowledge")
+        root = Adw.NavigationPage(
+            child=self._section_page(
+                "Knowledge", Gtk.ScrolledWindow(child=self.knowledge_list, vexpand=True)),
+            title="Knowledge")
+        self.knowledge_nav = Adw.NavigationView()
+        self.knowledge_nav.add(root)
+        return self.knowledge_nav
 
     def _refresh_knowledge(self):
         _clear_listbox(self.knowledge_list)
@@ -265,7 +364,8 @@ class MainWindow(Adw.ApplicationWindow):
         writer = KnowledgeWriter(self.project)
         header = f"# {page.title}\n_type: {page.kind.value} · sources: " \
                  f"{len(page.sources)} · confidence: {page.confidence}_\n\n"
-        _set_text(self.page_detail, header + writer.read_body(page))
+        self.knowledge_nav.push(
+            self._detail_page(page.title, header + writer.read_body(page)))
 
     # -- assistant pane ------------------------------------------------------
     def _build_assistant_pane(self) -> Gtk.Widget:
@@ -292,7 +392,7 @@ class MainWindow(Adw.ApplicationWindow):
         box.append(entry_row)
         self._last_query = None
         self._last_result = None
-        return box
+        return self._section_page("Assistant", box)
 
     def _on_ask(self, *_a):
         if not self.project:
@@ -338,7 +438,8 @@ class MainWindow(Adw.ApplicationWindow):
                                        margin_top=12, margin_bottom=12,
                                        margin_start=12, margin_end=12,
                                        selection_mode=Gtk.SelectionMode.NONE)
-        return Gtk.ScrolledWindow(child=self.review_list, vexpand=True)
+        return self._section_page(
+            "Review", Gtk.ScrolledWindow(child=self.review_list, vexpand=True))
 
     def _refresh_reviews(self):
         _clear_listbox(self.review_list)
