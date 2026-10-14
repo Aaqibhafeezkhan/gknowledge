@@ -81,6 +81,6 @@ El agente puede buscar en la wiki, leer páginas, hacer preguntas con citas y a�
 
 ## Contribuye
 
-Las contribuciones son bienvenidas, también en [Hacktoberfest](https://hacktoberfest.com): mira las [*good first issues*](https://github.com/openapi/gknowledge/labels/good%20first%20issue). Las traducciones a otros idiomas son especialmente bienvenidas.
+Las contribuciones son bienvenidas: mira las [*good first issues*](https://github.com/openapi/gknowledge/labels/good%20first%20issue). Las traducciones a otros idiomas son especialmente bienvenidas.
 
 El resto de la documentación está en el [README en inglés](README.md). Si gknowledge te resulta útil, una ⭐ ayuda a que otras personas lo encuentren.

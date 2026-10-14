@@ -296,7 +296,7 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 
 ## 8. Registro dei canali e delle ricerche già fatte
 
-> **Aggiornato al 14 ottobre 2026.** Questa sezione evita di ripetere le stesse indagini: elenca dove gknowledge è già stato proposto, con quale esito, quali piattaforme coprono i competitor e quali ricerche non hanno prodotto nulla. Prima di cercare nuovi canali, aggiornare questa sezione. I testi pronti da incollare sono in [`docs/launch/`](docs/launch/) (`directories.md`, `outreach.md`, `blog-post.md`, `zh.md`).
+> **Aggiornato al 14 ottobre 2026.** Questa sezione evita di ripetere le stesse indagini: elenca dove gknowledge è già stato proposto, con quale esito, quali piattaforme coprono i competitor e quali ricerche non hanno prodotto nulla. Prima di cercare nuovi canali, aggiornare questa sezione. I testi pronti da incollare sono in [`docs/launch/`](docs/launch/) (`directories.md`, `outreach.md`, `blog-post.md`, `zh.md`, `emerging.md`).
 
 ### 8.1 Stato delle candidature
 
@@ -316,6 +316,11 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 | awesome-gnome (1.622★, c'è Newelle) | lista awesome | — | **saltata**: richiede release stabili mature | proporre dopo Flathub |
 | HelloGitHub #3956, ruanyf/weekly #12333, OpenGithubs/monthly #33 | newsletter cinesi via issue | 13 ott 2026 | inviate | controllare risposte |
 | V2EX, Juejin, LINUX DO | comunità cinesi | 13 ott 2026 | bloccate (invito, telefono, codice) | testi in `docs/launch/zh.md` |
+| [up-for-grabs #6258](https://github.com/up-for-grabs/up-for-grabs.net/pull/6258) | elenco di progetti per principianti | 13 ott 2026 | **merged** | nessuno |
+| [awesome-for-beginners #2143](https://github.com/MunGell/awesome-for-beginners/pull/2143) | lista per principianti (90k★, pubblico forte in India e Africa) | 14 ott 2026 | PR aperta (`data.json`, Python, `good first issue`) | attendere merge |
+| [ollama/ollama #19001](https://github.com/ollama/ollama/pull/19001) | README Community Integrations (183k★), sezione RAG & Knowledge Bases | 14 ott 2026 | PR aperta; 80+ PR README in coda, merge rari | attendere |
+| PyCoder's Weekly | newsletter Python (form Google) | 14 ott 2026 | modulo compilato, **invio bloccato** dal classificatore auto mode | inviare a mano con i testi di `emerging.md` |
+| TabNews, r/developersIndia, Hashnode, Viblo, Techpoint Africa, organizzatori Hack Day | comunità e stampa in Africa e paesi emergenti | 14 ott 2026 | testi pronti in `emerging.md` | pubblicare dal proprio account; r/developersIndia solo nel thread Showcase dell'8 nov |
 
 ### 8.2 Dove i competitor prendono visibilità
 
@@ -374,3 +379,21 @@ Al 14 ottobre 2026 queste ricerche non hanno trovato copertura dei competitor; s
 - HackerNoon, Analytics Vidhya, MarkTechPost: nessuna menzione di OpenKnowledge.
 - YouTube: nessuna recensione video trovata via ricerca web.
 - Product Hunt: irrilevante per Tolaria (29 upvote, §3.3); per OpenKnowledge le cifre "#1" sono di seconda mano.
+- goodfirstissue.dev (DeepSource): richiede almeno 10 contributori; gknowledge ne ha 3. Riprovare più avanti.
+- Liste awesome regionali (awesome-indonesia-repo, awesome-brasil, awesome-vietnamese, liste Africa): accettano solo progetti di autori locali.
+- OSCA (Open Source Community Africa): la lista awesome-open-source non ha merge da gennaio 2024; nessun processo di showcase.
+- EndoTheDev/Awesome-Ollama, rafska/awesome-local-llm: nessun merge recente, decine o centinaia di PR in coda. vince-lam/awesome-local-llms è generato da uno scraper.
+- firstcontributions (/contribute-to-opensource): ultima aggiunta gennaio 2026, bassa priorità.
+- Newsletter in spagnolo, indonesiano, vietnamita o hindi che accettino segnalazioni via issue GitHub: nessuna trovata.
+- Masakhane, Zindi, Deep Learning Indaba, Data Science Nigeria: comunità di ricerca ML o competizioni, fuori tema per un'app desktop.
+
+### 8.4 Africa e paesi emergenti (14 ottobre 2026)
+
+Il messaggio per questo pubblico è **offline, senza API a pagamento, su un portatile Linux qualunque**, non Karpathy o MCP. Fatti e azioni:
+
+- **Hacktoberfest 2026 non conta più le PR** ([FAQ](https://hacktoberfest.com/questions/): "Pull requests and merge requests will no longer count toward Hacktoberfest rewards"). Il topic `hacktoberfest` non porta traffico, quindi non è stato aggiunto. Il tema 2026 è l'AI open source e i modelli open-weight; le sfide DEV HF26 richiedono un progetto nuovo costruito nella settimana della sfida, quindi gknowledge non è idoneo.
+- **Hack Day locali**: l'[API MLH](https://hacktoberfest-api.mlh.com/api/events) elenca 80 eventi futuri nelle aree target (Nigeria, Kenya, Uganda, Pakistan, Bangladesh, Brasile, Messico e altre). La lista breve e il messaggio agli organizzatori sono in `emerging.md`.
+- **README tradotti**: francese (Africa francofona), portoghese brasiliano e spagnolo, con una sezione "pensato per funzionare senza connessione". Issue #32–#40 (`good first issue`, `translation`) chiedono a madrelingua swahili, hausa, yoruba, amarico, arabo, hindi, indonesiano, bengali e vietnamita.
+- **Topic GitHub**: rimossi `llmwiki` (duplicato), `git-versioning` e `rest-api`; aggiunti `offline-first`, `local-first` e `gtk4`.
+- **Canali manuali verificati**: TabNews (BR; post sul proprio progetto ammessi se utili, `Pitch` nel titolo), r/developersIndia (solo thread Showcase mensile, secondo domenica), Viblo (VN; vieta pubblicità e post sotto 1.000 caratteri, serve un tutorial), Techpoint Africa (form di segnalazione). r/brdev rimuove i link a progetti propri: usare TabNews.
+

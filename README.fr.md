@@ -81,6 +81,6 @@ L'agent peut chercher dans le wiki, lire les pages, poser des questions avec cit
 
 ## Contribuer
 
-Les contributions sont les bienvenues, y compris pour [Hacktoberfest](https://hacktoberfest.com) : consultez les [*good first issues*](https://github.com/openapi/gknowledge/labels/good%20first%20issue). Les traductions vers d'autres langues, y compris les langues africaines, sont particulièrement appréciées.
+Les contributions sont les bienvenues : consultez les [*good first issues*](https://github.com/openapi/gknowledge/labels/good%20first%20issue). Les traductions vers d'autres langues, y compris les langues africaines, sont particulièrement appréciées.
 
 Le reste de la documentation se trouve dans le [README en anglais](README.md). Si gknowledge vous est utile, une ⭐ aide d'autres personnes à le trouver.
