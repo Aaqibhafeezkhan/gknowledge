@@ -293,3 +293,84 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 **Canale GNOME/Linux.** Alpaca (https://github.com/Jeffser/Alpaca; https://jeffser.com/alpaca/; flathub PR #5239, #5552, #6252; manifest com.jeffser.Alpaca.yml; Flathub stats/appstream/verification; Circle #230; AUR alpaca-ai; Repology; Ubuntu Handbook; Forbes; FOSS Force; TWIG #195, #234); Newelle (https://github.com/qwersyk/Newelle; https://newelle.qsk.me/; PR #4284; manifest; stats; AUR; Phoronix 1.0/1.2/image gen; TWIG #195, #202, #210, #233, #250, #255, #263); Bavarder/Imaginer (PR #4108, #4109, #4123; stats; TWIG #96); Moose (TWIG #268); Reins (TWIG #129); Apostrophe (GitLab; Circle #3, #215; stats; Repology); Iotas (PR #4877; Circle #238; stats); Folio; Planify (Circle #186; stats); Flathub docs: requirements, submission, linter, quality-guidelines, verification, maintenance, blog "Raising the Bar", "App safety", "Vorarbeiter"; flathub-infra/website safety.ts; Flathub API stats, permissions, search, openapi.json; GamingOnLinux (maggio 2026, policy AI); GNOME Circle: Teams/Circle README, AppCriteria.md, membership_guide.md, apps.json, issue #274, #280; Sophie Herold 2026-05-29; Fellowship Update 2026-10-07; Linuxiac 2026-05-30.
 
 **Repository gknowledge.** `README.md`, `data/io.gknowledge.Gknowledge.metainfo.xml`, `build-aux/flatpak/io.gknowledge.Gknowledge.yaml` (letti il 12 ottobre 2026).
+
+## 8. Registro dei canali e delle ricerche già fatte
+
+> **Aggiornato al 14 ottobre 2026.** Questa sezione evita di ripetere le stesse indagini: elenca dove gknowledge è già stato proposto, con quale esito, quali piattaforme coprono i competitor e quali ricerche non hanno prodotto nulla. Prima di cercare nuovi canali, aggiornare questa sezione. I testi pronti da incollare sono in [`docs/launch/`](docs/launch/) (`directories.md`, `outreach.md`, `blog-post.md`, `zh.md`).
+
+### 8.1 Stato delle candidature
+
+| Canale | Tipo | Data | Stato | Prossimo passo |
+|---|---|---|---|---|
+| [awesome-llm-wiki #12](https://github.com/gavischneider/awesome-llm-wiki/pull/12) | lista awesome (219★, la lista di categoria: nashsu, Tolaria, OpenKnowledge) | 14 ott 2026 | PR aperta, awesome-lint verde | attendere merge |
+| [awesome-opensource-ai #840](https://github.com/alvinreal/awesome-opensource-ai/pull/840) | lista awesome (4.884★, accanto a Khoj e Newelle) | 14 ott 2026 | PR aperta, validator verde | attendere merge |
+| [awesome-gtk #465](https://github.com/valpackett/awesome-gtk/pull/465) | lista awesome (1.268★, Note-taking accanto a Iotas/Folio) | 14 ott 2026 | PR aperta, `lint.py` verde | attendere merge |
+| [Karpathy-LLM-Wiki-Stack](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/pull/2#issuecomment-6165166168) | blueprint (94★, tabella risorse con nashsu) | 14 ott 2026 | richiesta di revisione in un commento sulla PR #2; il repo non ha mai accettato PR esterne | se non risponde, aprire una issue |
+| AlternativeTo | directory | 14 ott 2026 | scheda inviata (coda gratuita, autore "Openapi"), 16 alternative collegate: Reor, Khoj, OpenKnowledge, Tolaria, Gemini Notebook (= NotebookLM), Mempipe, Obsidian, Logseq, SiYuan, Trilium, Zettlr, AnythingLLM, PrivateGPT, Open Notebook, Blinko, Nodus | attendere revisione; non condividere il link prima. La priorità costa $5 |
+| OpenAlternative | directory | 14 ott 2026 | **non inviata**: servono 250★ per repo con meno di 6 mesi (50★ dal 7 gen 2027) e un sito su dominio proprio; le schede gratuite escono una al giorno lavorativo | riprovare con `gknowledge.io` attivo |
+| EveryDev.ai | directory di AI dev tools (c'è OpenKnowledge) | 14 ott 2026 | login GitHub fatto; serve completare l'onboarding del profilo prima di `/create/tool` | completare onboarding, poi compilare con `directories.md` |
+| ClaudeKit (claudekit.io) | sito coreano curato a mano di strumenti per Claude Code (c'è nashsu) | 14 ott 2026 | **non raggiungibile**: nessun form, repo o contatto | nessuno |
+| dev.to | articolo | 13 ott 2026 | [pubblicato](https://dev.to/francescobianco/i-turned-karpathys-llm-wiki-into-a-native-gnome-app-and-it-works-offline-130c) | ripubblicare su Medium con canonical a dev.to |
+| Theo James (Medium, editor di *Better Workflow*) | classifica "8 Apps… Karpathy-Style LLM Knowledge Base" | 14 ott 2026 | testo pronto in `outreach.md` (risposta all'articolo o pitch alla pubblicazione); nessun contatto esterno | inviare da account Medium |
+| Prahlad G. Menon (themenonlab.blog) | blog che ha coperto Tolaria e OKF | 14 ott 2026 | email pronta in `outreach.md` (prahlad.menon@quant.md) | inviare |
+| awesome-gnome (1.622★, c'è Newelle) | lista awesome | — | **saltata**: richiede release stabili mature | proporre dopo Flathub |
+| HelloGitHub #3956, ruanyf/weekly #12333, OpenGithubs/monthly #33 | newsletter cinesi via issue | 13 ott 2026 | inviate | controllare risposte |
+| V2EX, Juejin, LINUX DO | comunità cinesi | 13 ott 2026 | bloccate (invito, telefono, codice) | testi in `docs/launch/zh.md` |
+
+### 8.2 Dove i competitor prendono visibilità
+
+Mappa delle piattaforme trovate il 14 ottobre 2026, raggruppate per modo di accesso.
+
+**Liste awesome e curate su GitHub** (ricerca: README che linkano `nashsu/llm_wiki`, `refactoringhq/tolaria`, `inkeep/open-knowledge`, `Jeffser/Alpaca`, `qwersyk/Newelle`):
+
+| Lista | ★ | Esito |
+|---|---|---|
+| gavischneider/awesome-llm-wiki | 219 | PR #12 |
+| alvinreal/awesome-opensource-ai | 4.884 | PR #840 |
+| valpackett/awesome-gtk | 1.268 | PR #465 |
+| Kazhnuz/awesome-gnome | 1.622 | rimandata (maturità) |
+| ScrapingArt/Karpathy-LLM-Wiki-Stack | 94 | commento |
+| weijt606/ai-agent-map | 75 | non valutata a fondo |
+| fsaint/bestOfSecondBrainLLM, zhuyansen/awesome-obsidian-ai-skills, tech-anupam/awesome-agentic-ecosystem, scholar-zishan/awesome-opensource-ai, csells/awesome-jarvis | 0–13 | scartate: traffico nullo |
+| uhub/awesome-llm, uhub/awesome-typescript | — | generate dai topic GitHub: dipendono dai topic del repo |
+| raccolte "awesome-stars" personali, github-trending archive | — | automatiche, non sollecitabili |
+
+**Directory di software:** AlternativeTo (OpenKnowledge, Reor, Khoj), OpenAlternative (Tolaria), openapps.pro (Tolaria), EveryDev.ai (OpenKnowledge), skills-hub.ai (OpenKnowledge), ClaudeKit (nashsu), winget GUI e wingetly (nashsu, solo Windows), OnWorks (pagine Linux generate automaticamente).
+
+**Aggregatori automatici** (si attivano con stelle e GitHub Trending, non si sollecitano): SourcePulse, gittrend.io, heatdrop.ai, feedbagel, Trendshift, gitblind, AIToolly (ha coperto nashsu dal trending in più lingue).
+
+**Articoli e blog** (si raggiungono contattando l'autore):
+
+| Piattaforma | Cosa ha coperto | Accesso |
+|---|---|---|
+| [Medium, Theo James](https://medium.com/@theo-james/karpathy-style-llm-knowledge-base-apps-ba4735322be9) | classifica di 8 app (NotebookLM, Recall, Obsidian, Khoj, AnythingLLM, Quivr, Heptabase, Constella sponsorizzato) | risposta Medium, pubblicazione *Better Workflow* |
+| [Medium, Kristopher Dunham](https://medium.com/@creativeaininja/this-open-source-app-turns-your-documents-into-a-self-building-wiki-b3b5778903dd) | recensione di nashsu, finita in awesome-llm-wiki | risposta Medium |
+| [Stackademic](https://blog.stackademic.com/rag-is-dead-llm-wiki-andrej-karpathys-idea-is-what-comes-next-a71fa3c414a4) | "RAG is dead, LLM Wiki is next" | pubblicazione Medium aperta a contributi |
+| [themenonlab.blog](https://themenonlab.blog/blog/tolaria-karpathy-llm-wiki-desktop-app) | Tolaria, Google OKF | email (vedi `outreach.md`) |
+| [AI Chat Daily](https://www.aichatdaily.com/ai-tools/karpathy-s-llm-wiki-idea-spawns-cottage-industry) | il fenomeno LLM Wiki | da contattare |
+| [The AI Operator](https://theaioperator.io/p/i-rebuilt-karpathys-llm-wiki-heres) | Substack sul pattern | da contattare |
+| [AFFiNE blog](https://affine.pro/blog/llm-wiki), [Denser](https://denser.ai/blog/llm-wiki-karpathy-knowledge-base/), [SmartScope](https://smartscope.blog/en/blog/llm-wiki-context-architecture/), [Pebblous](https://blog.pebblous.ai/report/karpathy-llm-wiki/en/), Neo4j | blog di vendor che spiegano il pattern e citano nashsu | basso valore, vendor concorrenti |
+| [Towards Data Science](https://towardsdatascience.com/llm-wikis-are-over-engineered-i-replaced-mine-with-a-pure-python-compiler/) | articolo critico sugli LLM wiki | accetta articoli esterni |
+| [PromptZone](https://www.promptzone.com/paulina_laurent/openknowledge-open-source-ai-note-taking-tool-5gal), [braindetox.kr](https://braindetox.kr/en/posts/openknowledge_obsidian_alternative_2026.html) (4 lingue) | OpenKnowledge | community aperta / autore |
+| [drweb.de](https://www.drweb.de/openknowledge-der-quelloffene-markdown-editor-der-mit-claude-und-codex-zusammenarbeitet/) (DE), [logicity.in](https://logicity.in/en/blog/openknowledge-open-source-ai-editor-takes-on-obsidian), [pyshine.com](https://pyshine.com/LLM-Wiki-Personal-Knowledge-Base-That-Builds-Itself/), [ecosistemastartup.com](https://ecosistemastartup.com/tolaria-app-open-source-macos-para-gestionar-conocimiento-en-markdown/) (ES) | OpenKnowledge, nashsu, Tolaria | redazioni da contattare |
+| [PromptQuorum](https://www.promptquorum.com/power-local-llm/khoj-ai-second-brain-review) | recensione di Khoj (LLM locali) | da contattare |
+| [Platformer](https://www.platformer.news/karpathy-llm-wiki-journalism-productivity/), [Implicator](https://implicator.ai/karpathys-llm-wiki-got-16-million-views-the-code-isnt-the-point-2/), TechTimes, AI Weekly | stampa sul pattern e su OpenKnowledge (dopo Show HN) | solo dopo un lancio con trazione |
+
+**Stampa Linux/GNOME** (dove Newelle e Alpaca hanno avuto copertura; nessun competitor Tauri/Electron ci è arrivato): Phoronix (4 articoli su Newelle, si attiva con release con nome), OMG! Ubuntu (tag Newelle), MakeTechEasier, Ubuntu Handbook, FOSS Force ("Linux App of the Week"), LinuxLinks ("Machine Learning in Linux", Reor), AlternativeTo News, This Week in GNOME (§5.5).
+
+**Social:** su X [@DataChaz](https://x.com/DataChaz/status/2048333579751702853) e [@Sumanth_077](https://x.com/Sumanth_077/status/2054566469036613811) hanno spinto Tolaria con la formula "Karpathy's LLM wiki just became a real app"; su TikTok [@github.awesome](https://www.tiktok.com/@github.awesome/video/7632867290555419918) presenta repository GitHub. Da contattare in DM dal proprio account.
+
+**Comunità:** r/LLM_Wiki (linkato dal badge di awesome-llm-wiki), [TiddlyWiki forum](https://talk.tiddlywiki.org/t/riding-the-wave-of-andrej-karpathys-llm-wiki/15214), Hacker News (§4, un solo Show HN utile per progetto).
+
+### 8.3 Ricerche senza risultati (non ripetere)
+
+Al 14 ottobre 2026 queste ricerche non hanno trovato copertura dei competitor; sono spazi liberi, ma senza un pubblico già agganciato alla categoria:
+
+- XDA, MakeUseOf, How-To Geek, It's FOSS, Linuxiac, 9to5Linux, GamingOnLinux: nessun articolo su Tolaria, nashsu, OpenKnowledge, Newelle o Alpaca.
+- Zenn, Qiita (JP): nessun articolo su nashsu/llm_wiki.
+- 少数派, 掘金, CSDN, 知乎 (CN): nessun articolo trovato via ricerca web (le ricerche interne ai siti non sono state fatte).
+- GeekNews / news.hada.io (KR): nessun post sulle app LLM Wiki.
+- console.dev, TLDR: nessuna menzione.
+- HackerNoon, Analytics Vidhya, MarkTechPost: nessuna menzione di OpenKnowledge.
+- YouTube: nessuna recensione video trovata via ricerca web.
+- Product Hunt: irrilevante per Tolaria (29 upvote, §3.3); per OpenKnowledge le cifre "#1" sono di seconda mano.
