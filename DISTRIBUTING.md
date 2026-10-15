@@ -410,3 +410,63 @@ Il messaggio per questo pubblico è **offline, senza API a pagamento, su un port
 **Conseguenze per gknowledge:** il passo che conta è un solo Show HN preparato bene, non altre directory. Prima del post: README con GIF reale, tabella di misure riproducibili (dimensione, tempo di ingestione offline per N pagine, RAM, zero chiamate di rete), sezione "limiti", confronto con nashsu, Tolaria, Reor e OpenKnowledge, badge ridotti a circa 6, homepage del repo diversa da `console.openapi.com`. Nelle due settimane prima: 3–5 commenti veri su thread HN di LLM wiki o LLM locali. Il giorno: lun–mer 14–15 UTC, link al repo, primo commento "perché l'ho fatto" senza link, presenza per 6 ore. Non copiare: Show HN ripetuti, la cadenza di release come leva per le stelle, storia dei commit riscritta.
 
 **Decisione (15 ottobre 2026):** nessuna azione derivata da questo studio. Il successo di kern su Hacker News è documentato, ma l'effetto sul lungo periodo non è noto: 442★ dopo meno di tre mesi non dicono se la crescita durerà, né se il solo Show HN basti senza una presenza continua. Il README di gknowledge **non va modificato** per adattarlo a HN (niente tabella di misure, sezione limiti, riduzione dei badge). Le considerazioni sopra restano come riferimento; rivalutare osservando le stelle di kern nei prossimi mesi (`gh api repos/getkern/kern -q .stargazers_count`, 442 il 15 ott 2026).
+
+## 9. Studio: le prime 100 stelle senza rivoluzionare README e progetto (15 ottobre 2026)
+
+> Vincolo deciso dall'utente: niente riscrittura del README né modifiche al prodotto per inseguire un canale (§8.5). Solo espedienti legittimi. Nessuna azione è stata eseguita: questa sezione è il piano.
+
+### 9.1 Punto di partenza
+
+- **15 stelle, di cui 13 di colleghi** messe il 23–24 settembre, più 2 dei maintainer delle liste awesome il 14 ottobre. La rete interna è esaurita.
+- **Il collo di bottiglia è il traffico, non la conversione**: 56 visite e 10 visitatori unici in 14 giorni; referrer github.com (4) e news.ycombinator.com (2, nessun post HN su gknowledge trovato). 0 watcher, quindi le release non notificano nessuno. 35 download delle release in totale.
+- **Canali propri non usati**: gknowledge non è tra i 6 repo fissati sul profilo dell'org (86 follower), né sul profilo di francescobianco (217 follower); il README del profilo dell'org non lo cita; blog openapi.com, YouTube, LinkedIn, Instagram e Facebook dell'azienda non ne hanno mai parlato. I repo fratelli portano poco: openapi-skills 60 unici in 14 giorni, openapi-python-sdk 36, openapi-cli 22, mcp-server 15.
+- **Homepage del repo** = `console.openapi.com`: nelle anteprime di HN e Reddit è un link fuorviante. È un'impostazione del repo, non del README.
+- `gknowledge-mcp` non è su PyPI né nel registro MCP.
+
+### 9.2 Cosa dicono i dati
+
+- **GitHub Trending Python (giornaliero)**, letto il 15 ott alle 08:40 UTC: l'ultimo progetto in lista aveva **16 stelle nel giorno**; la soglia pratica è circa **20–40 stelle in 24 ore**. Non esiste un trending per topic. Entrare in trending attiva gli aggregatori automatici di §8.2.
+- **Hacker News**: su 138 lanci di repo AI/LLM nel 2024–25 ([Kraishan 2025](https://arxiv.org/abs/2511.04453)) la mediana è circa **+40 stelle in 24 ore e +85 in 7 giorni**, ma i repo partivano in media da 1.247 stelle. L'etichetta "Show HN" non dà vantaggi (p = 0,39). L'orario migliore è incerto: il testo dello studio indica 12–17 UTC, il grafico mostra il contrario (06–11 UTC). [Borges & Valente 2019](https://arxiv.org/pdf/1908.04219): mediana da 74 a 138 stelle nei 3 giorni attorno a un post HN riuscito. [BookStack](http://www.bookstackapp.com/blog/9000-stars-and-the-effects-of-hacker-news/): 13.000 visitatori nel giorno HN contro ~700.
+- **Reddit**: un progetto Terraform ha preso ~50 stelle da tre subreddit ([dev.to](https://dev.to/adinhodovic/github-s-awesome-repository-traffic-analytics-3hpd)); Infisical lo chiama uno dei canali principali, senza numeri. Serve karma pregresso.
+- **Canali aziendali**: nessuno studio con dati di referrer. Il pubblico di openapi (acquirenti B2B italiani di API) è lontano da quello di gknowledge: aspettarsi poco, ma il costo è basso.
+
+### 9.3 Cosa non fare (GitHub Acceptable Use Policies §4, linee guida HN e Reddit)
+
+- Comprare stelle, scambi "star-for-star", bot, account falsi: vietati come "coordinated inauthentic activity", "rank abuse" e "secondary markets" ([AUP](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies)).
+- Giveaway o premi in cambio di una stella: vietati dalla stessa policy (engagement incentivato).
+- **Campagne interne "mettete una stella"**: lo [studio sulle stelle false](https://arxiv.org/html/2412.13459v1) (CMU, NCSU, Socket: 4,5 milioni di stelle sospette) rileva proprio le stelle "in lockstep", molti account nella stessa finestra breve. Le 13 stelle del 23–24 settembre hanno già quella forma: non ripeterla. Un collega che usa l'app e la stella da solo va bene.
+- Chiedere voti su HN o Reddit, ripostare lo stesso testo in più subreddit.
+
+### 9.4 Regole dei canali verificate
+
+- **r/LocalLLaMA**: autopromozione al massimo 1 post su 10, affiliazione dichiarata, karma minimo, testo scritto da LLM solo se dichiarato.
+- **r/selfhosted**: progetti con meno di 3 mesi solo il venerdì ("New Project Friday").
+- **r/ObsidianMD e forum Obsidian**: il codice di condotta vieta l'autopromozione esclusiva; i post "Share & showcase" su LLM wiki hanno avuto 0 risposte. Meglio rispondere, dichiarandosi, al thread esistente su "automated inter-note linking… using GPT or other LLMs".
+- **Lobsters**: solo su invito, autopromozione ≤25%. Bassa priorità.
+- **Registro MCP ufficiale**: pacchetto PyPI la cui descrizione contiene `mcp-name: io.github.openapi/gknowledge` (anche in un commento HTML), più `server.json` e `mcp-publisher`. `pyproject.toml` può puntare a un `README.pypi.md` separato: il README principale resta intatto.
+- **Glama**: i repo di organizzazioni rivendicano la scheda con un `glama.json` nella radice. **punkpeye/awesome-mcp-servers**: PR, sezione "🧠 Knowledge & Memory". PulseMCP importa dal registro (non verificato).
+
+### 9.5 Piano in 6–8 settimane
+
+| # | Azione | Chi | Sforzo | Stelle attese | Base |
+|---|---|---|---|---|---|
+| 1 | Show HN (testo pronto in `docs/launch/README.md`), settimana 3, poi 6 ore nel thread | utente | M | 0–80 (mediana 30–40) | Kraishan; kern +64 in 3 ore; varianza alta |
+| 2 | Reddit in sequenza con testi diversi e affiliazione dichiarata: r/LocalLLaMA, r/ObsidianMD, r/selfhosted (venerdì), poi r/gnome e r/linux | utente | M | 10–40 | Terraform ~50 da 3 subreddit; serve karma |
+| 3 | Concentrare 1, 2, 4 e 5 in 48 ore (mar–mer) per entrare nel trending Python | utente | tempi | +10–50 se riesce | soglia 16–40 stelle/giorno |
+| 4 | Canali aziendali: articolo sul blog openapi.com (canonical a dev.to), post LinkedIn aziendale con condivisioni dei colleghi con parole proprie (non "mettete una stella"), demo YouTube di 2 minuti | utente | M | 5–15 | nessun dato pubblicato; pubblico lontano |
+| 5 | Thread X/Mastodon/Bluesky e DM a @DataChaz e @Sumanth_077 | utente | L | 2–20 | crescita di Tolaria su X (§8.2) |
+| 6 | Item TWIG e segnalazione a Phoronix e OMG! Ubuntu con la v0.3 | utente | L | 3–10 | Newelle e Alpaca coperti lì |
+| 7 | Pacchetto MCP: `gknowledge-mcp` su PyPI con README PyPI separato, `server.json`, registro, `glama.json`, PR ad awesome-mcp-servers (issue #22) | noi, pubblicazione con credenziali utente | M | 2–8 | regole verificate; da controllare che giri senza GTK |
+| 8 | Outreach già pronta: Menon, Theo James, PyCoder's (§8.1) | utente | L | 0–10 | una newsletter può portarne decine, spesso zero |
+| 9 | Fissare gknowledge sul profilo dell'org (al posto di un SDK) e sul profilo personale; una riga nel README del profilo dell'org | utente (pin), noi (PR al README dell'org) | XS | 1–4 | 86 + 217 follower |
+| 10 | Link incrociati dai README di openapi-skills, openapi-python-sdk e mcp-server | noi | XS | 1–3 | 133 unici in 14 giorni in totale |
+| 11 | Topic: sostituire api-marketplace, certified-api, openapi, openclaw con gnome, libadwaita, karpathy, ollama, mcp-server, obsidian | noi | XS | 0–3 | evidenza debole |
+| 12 | Risposte dichiarate in thread esistenti (forum Obsidian, r/LocalLLaMA, HN) | utente | L, continuo | 1–5 | i post showcase lì hanno 0 risposte |
+| 13 | Attivare Discussions, annunciarvi le release, chiedere ai primi utenti di seguire il repo (Watch) | noi | XS | 0–2 | trattiene i visitatori, non ne porta |
+| — | Homepage del repo verso la pagina delle release o di installazione | noi | XS | — | evita un link fuorviante nelle anteprime |
+
+**Sequenza.** Settimane 1–2: preparazione (7, 9, 10, 11, 13 e homepage da parte nostra; pin, outreach pronta, karma Reddit, 3–5 commenti HN veri e il video da parte dell'utente). Settimana 3: tutto il lancio in 48 ore (Show HN, social, LinkedIn e blog il primo giorno; r/LocalLLaMA e r/ObsidianMD il secondo; r/selfhosted il venerdì), obiettivo 30+ stelle in 24 ore. Settimane 4–5: v0.3 con una funzione dal nome riconoscibile, TWIG, Phoronix, r/gnome, r/linux. Settimane 6–8: risposte nei thread, Medium, thread Showcase di r/developersIndia dell'8 novembre, controllo delle PR aperte.
+
+**Stima.** Con tutto il piano, la somma dei valori centrali è circa **+80–110 stelle**. Senza Show HN scende a **+45–70**: le 100 in 8 settimane diventano improbabili senza HN o un giorno in trending. L'alternativa a puntare tutto su HN è la combinazione Reddit + 48 ore concentrate.
+
+**Non conviene:** Lobsters (invito), altre liste awesome piccole, pubblicità, giveaway (vietati).
