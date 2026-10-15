@@ -302,7 +302,7 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 
 | Canale | Tipo | Data | Stato | Prossimo passo |
 |---|---|---|---|---|
-| [awesome-llm-wiki #12](https://github.com/gavischneider/awesome-llm-wiki/pull/12) | lista awesome (219★, la lista di categoria: nashsu, Tolaria, OpenKnowledge) | 14 ott 2026 | PR aperta, awesome-lint verde | attendere merge |
+| [awesome-llm-wiki #12](https://github.com/gavischneider/awesome-llm-wiki/pull/12) | lista awesome (219★, la lista di categoria: nashsu, Tolaria, OpenKnowledge) | 14 ott 2026 | **merged** il 14 ott; ringraziato l'autore il 15 ott con link all'org | nessuno |
 | [awesome-opensource-ai #840](https://github.com/alvinreal/awesome-opensource-ai/pull/840) | lista awesome (4.884★, accanto a Khoj e Newelle) | 14 ott 2026 | PR aperta, validator verde | attendere merge |
 | [awesome-gtk #465](https://github.com/valpackett/awesome-gtk/pull/465) | lista awesome (1.268★, Note-taking accanto a Iotas/Folio) | 14 ott 2026 | PR aperta, `lint.py` verde | attendere merge |
 | [Karpathy-LLM-Wiki-Stack](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/pull/2#issuecomment-6165166168) | blueprint (94★, tabella risorse con nashsu) | 14 ott 2026 | richiesta di revisione in un commento sulla PR #2; il repo non ha mai accettato PR esterne | se non risponde, aprire una issue |
@@ -330,7 +330,7 @@ Mappa delle piattaforme trovate il 14 ottobre 2026, raggruppate per modo di acce
 
 | Lista | ★ | Esito |
 |---|---|---|
-| gavischneider/awesome-llm-wiki | 219 | PR #12 |
+| gavischneider/awesome-llm-wiki | 219 | PR #12 merged |
 | alvinreal/awesome-opensource-ai | 4.884 | PR #840 |
 | valpackett/awesome-gtk | 1.268 | PR #465 |
 | Kazhnuz/awesome-gnome | 1.622 | rimandata (maturità) |
