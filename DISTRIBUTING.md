@@ -384,6 +384,7 @@ Al 14 ottobre 2026 queste ricerche non hanno trovato copertura dei competitor; s
 - OSCA (Open Source Community Africa): la lista awesome-open-source non ha merge da gennaio 2024; nessun processo di showcase.
 - EndoTheDev/Awesome-Ollama, rafska/awesome-local-llm: nessun merge recente, decine o centinaia di PR in coda. vince-lam/awesome-local-llms è generato da uno scraper.
 - firstcontributions (/contribute-to-opensource): ultima aggiunta gennaio 2026, bassa priorità.
+- Liste awesome-hacktoberfest (verificate il 15 ottobre 2026): OtacilioN/awesome-hacktoberfest (862★) non ha merge da ottobre 2023 e ha 23 PR in coda; mattjegan/awesome-hacktoberfest (133★) non aggiunge progetti da ottobre 2024; Piyushhbhutoria/awesome-hacktoberfest-2026 (62★) ha fatto l'ultimo merge a novembre 2025, ha poco pubblico ed è l'unica che si potrebbe ancora tentare. Dato che Hacktoberfest 2026 non conta più le PR (§8.4), le etichette `hacktoberfest`, `hacktoberfest-accepted` e `spam` non servono.
 - Newsletter in spagnolo, indonesiano, vietnamita o hindi che accettino segnalazioni via issue GitHub: nessuna trovata.
 - Masakhane, Zindi, Deep Learning Indaba, Data Science Nigeria: comunità di ricerca ML o competizioni, fuori tema per un'app desktop.
 
