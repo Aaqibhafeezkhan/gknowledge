@@ -5,6 +5,7 @@ the wiki, read pages, ask cited questions and add new sources. Stdlib only,
 JSON-RPC 2.0 over stdio (newline-delimited).
 
     gknowledge-mcp /path/to/project
+    gknowledge-mcp --init /path/to/project   # create the project if missing
     python3 -m gknowledge.mcp /path/to/project
 
 Register with Claude Code:
@@ -186,9 +187,14 @@ class WikiServer:
 
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    init = "--init" in argv
+    argv = [a for a in argv if a != "--init"]
     path = argv[0] if argv else os.environ.get("GKNOWLEDGE_PROJECT", "")
+    if path and init and not Project.is_project(path):
+        Project.create(path).close()
     if not path or not Project.is_project(path):
-        print("usage: gknowledge-mcp /path/to/gknowledge/project", file=sys.stderr)
+        print("usage: gknowledge-mcp [--init] /path/to/gknowledge/project",
+              file=sys.stderr)
         return 2
     server = WikiServer(Project.open(path))
     for line in sys.stdin:

@@ -18,7 +18,7 @@ METAINFODIR := $(DATADIR)/metainfo
 
 INSTALL     := install
 
-.PHONY: all help check test run dev start demo-svg install uninstall clean dist flatpak
+.PHONY: all help check test run dev start demo-svg install uninstall clean dist pypi flatpak
 
 all: help
 
@@ -31,6 +31,7 @@ help:
 	@echo "  make install    Install locally into $(PREFIX)"
 	@echo "  make uninstall  Remove a local install"
 	@echo "  make dist       Build a wheel/sdist with the Python build backend"
+	@echo "  make pypi       Build the gknowledge-mcp package for PyPI into dist/pypi"
 	@echo "  make flatpak    Build a Flatpak (needs flatpak-builder)"
 	@echo "  make clean      Remove build artifacts"
 
@@ -104,6 +105,9 @@ uninstall:
 
 dist:
 	$(PYTHON) -m build
+
+pypi:
+	build-aux/pypi/build.sh dist/pypi
 
 flatpak:
 	flatpak-builder --user --install --force-clean build-aux/flatpak-build \
