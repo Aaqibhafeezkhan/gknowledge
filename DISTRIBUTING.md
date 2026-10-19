@@ -516,12 +516,12 @@ Calendario: TWIG esce il venerdì, gli item vanno inviati entro giovedì. Lo Sho
 | entro gio 22 ott | **Item TWIG** per la 0.3.0 nella stanza Matrix `#thisweek:gnome.org` | utente | `docs/launch/README.md` |
 | gio 22 – ven 23 ott | Segnalazione a Phoronix e OMG! Ubuntu; articolo di aggiornamento su dev.to ("0.3: now on any distro via Flatpak, and pages that know when their source changed") | utente | `docs/launch/README.md` |
 | settimana del 19 | 3–5 commenti veri su thread HN di LLM wiki o LLM locali; karma Reddit | utente | — |
-| **mar 27 o mer 28 ott, 14–15 UTC** | **Show HN** + thread X/Mastodon + post LinkedIn aziendale lo stesso giorno; 6 ore nel thread | utente | `docs/launch/README.md` (aggiornato alla 0.3) |
+| ~~mar 27 o mer 28 ott~~ | ~~Show HN~~: sostituito dal post HN del 19 ott (§10.4). Thread X/Mastodon e post LinkedIn aziendale restano, in un giorno a scelta | utente | `docs/launch/README.md` (aggiornato alla 0.3) |
 | giorno dopo | r/LocalLLaMA e r/ObsidianMD, testi diversi | utente | `docs/launch/README.md` |
 | ven 30 ott | r/selfhosted (New Project Friday) | utente | — |
 | inizio novembre | r/gnome, r/linux; outreach Menon, Theo James, PyCoder's (§8.1); Showcase di r/developersIndia l'8 nov | utente | `outreach.md`, `emerging.md` |
 
-Obiettivo: 30+ stelle nelle 24 ore dello Show HN, per entrare nel trending Python (§9.2). Criterio di verifica: visite uniche e stelle, non clone.
+Obiettivo originale: 30+ stelle nelle 24 ore dello Show HN, per entrare nel trending Python (§9.2). Dopo il §10.4 il peso passa a TWIG, Phoronix/OMG! Ubuntu e Reddit. Criterio di verifica: visite uniche e stelle, non clone.
 
 **Stato al 19 ottobre 2026 (sera).**
 
@@ -529,3 +529,12 @@ Obiettivo: 30+ stelle nelle 24 ore dello Show HN, per entrare nel trending Pytho
 - Annuncio della 0.3 nelle Discussions dell'org, categoria Open Source AI: [#72](https://github.com/orgs/openapi/discussions/72), accanto a quello della 0.2 (#71). Al posto di attivare le Discussions sul repo si usano quelle dell'org: il ticker Pulse le linka da ogni README dell'org, e un secondo spazio dividerebbe una comunità ancora piccola.
 - Link incrociati (azione 10): una riga in openapi-skills e openapi-python-sdk (sezione "Related projects"), in mcp-server ("Useful Resources") e nel README del profilo dell'org. Le PR vanno aperte dall'utente: il classificatore di auto mode blocca le scritture su altri repository.
 - Glama: scheda ancora assente (404 su `glama.ai/mcp/servers/openapi/gknowledge`); serve il login dell'utente.
+
+### 10.4 Il post su Hacker News del 19 ottobre
+
+Il 19 ottobre alle 14:36 UTC l'utente ha pubblicato su HN [*The Second Brain Gnome Users Deserve. Go Ahead, HN. Flag This OpenSourceProject*](https://news.ycombinator.com/item?id=50153030), con link all'annuncio [#72](https://github.com/orgs/openapi/discussions/72) e non al repo, senza prefisso "Show HN". Alla pubblicazione: primo su /newest, visibile anche senza login, 1 punto, 0 commenti.
+
+- **Contesto dell'account** (`hacker-news.firebaseio.com/v0/user/francescobianco`): karma 8; i post del 3, 4, 10 e 13 ottobre e uno del 29 settembre risultano `dead`.
+- **Rischi segnalati e accettati**: titolo che invita al flag, link a una pagina di annuncio invece che al repo, assenza da /show, effetto su un eventuale Show HN successivo. Proposta di cancellarlo finché aveva 0 commenti: **rifiutata**. L'utente accetta di perdere il lancio HN pianificato e sta preparando un repository separato per far crescere il karma dell'account.
+- **Conseguenza per il piano**: lo Show HN del 27/28 ottobre esce dalla sequenza di §10.3. HN resta un canale dell'utente, gestito alle sue condizioni; non va più riproposto nei piani.
+- **Da osservare**: punti, commenti e stato `dead` o `flagged` dell'item 50153030; referrer `news.ycombinator.com` nel traffico del repo e della discussione #72.
