@@ -9,12 +9,13 @@ Source: [comment by Justin (@fromthearchitect)](https://dev.to/fromthearchitect/
 Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE users)
 - [x] Flatpak build is green in CI (`appstreamcli compose` succeeds since the GNOME 51 bump); every release attaches a bundle and `repos.yml` publishes the remote at `openapi.github.io/gknowledge` (closes #24).
 - [x] `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref` works on Ubuntu (2026-10-19): pulls GNOME 51 from Flathub, installs 0.2.2, the app launches.
-- [ ] Inside the Flatpak: create a project, import through the portal, ingest, reopen after a restart.
+- [x] Inside the Flatpak, New Project failed with "disk I/O error" (SQLite WAL needs shared memory the document portal does not provide); the store no longer uses WAL and converts old databases. Project creation, PDF/Markdown import, ingest, query and drift check verified on a portal path (2026-10-19).
+- [ ] Inside the Flatpak, by hand: create a project, import through the file chooser, ingest, reopen after a restart.
 - [ ] Verify on a non-Ubuntu distro (Fedora VM or toolbox) before replying to Justin.
 - [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
 - [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Builds green on PR #42.
-- [ ] Push a release so the published bundle includes the stale-source check, then tag the remote as tested.
-- [ ] Make the CI and release Flatpak jobs blocking (drop `continue-on-error`) now that they pass.
+- [ ] Release 0.3.0 (prepared 2026-10-19: version, CHANGELOG, MetaInfo, release notes with the Flatpak line): test the CI bundle end to end, merge, tag `v0.3.0`, then reinstall from the Pages remote and check `flatpak update`.
+- [x] CI and release Flatpak jobs are blocking (no `continue-on-error`); CI uploads an installable `gknowledge-dev.flatpak` artifact for every PR.
 - [ ] Flathub itself stays paused (AI-assisted code policy, see P0 below); say so plainly if asked, and point to the Pages remote.
 
 Develop against the runtime users get
@@ -86,7 +87,7 @@ Speed and feedback
 - [ ] Publish a statement on AI-assisted code (Flathub and GNOME Circle have an AI-code policy since May 2026; this repo is developed with AI assistance and must say so plainly).
 
 ### Flatpak and Flathub (paused: kept warm, do not submit until policy allows AI-assisted code)
-- [ ] Decide the app ID (`io.github.<owner>.Gknowledge` or a verified domain). `io.gknowledge.*` needs a domain we control.
+- [x] App ID is `io.github.openapi.Gknowledge` since 0.3.0 (`io.gknowledge.*` used gknowledge.io, which nobody owns). The Pages remote rebases the old ID with end-of-life-rebase; `.desktop` has `X-Flatpak-RenamedFrom`, MetaInfo has `<replaces>`.
 - [x] Bump the runtime to GNOME 51 (current stable on Flathub). Not yet built in CI.
 - [x] Replace `--filesystem=home` with FileChooser / Documents portals; keep only `--share=network`. Done in the manifest, untested in a real Flatpak build.
 - [ ] Build from `git`/`archive` sources instead of `type: dir` (`pypdf` vendored).
@@ -100,7 +101,7 @@ Speed and feedback
 - [x] Keyboard accelerators for new/open/preferences/quit.
 - [x] Desktop entry advertises Markdown, text, PDF and HTML; files passed by the file manager are imported into the current project.
 - [x] About dialog points to the real repository and issue tracker.
-- [ ] GSettings schema (`io.gknowledge.Gknowledge`): window size, maximized, last project, provider; install and compile it in `make install` and the Flatpak.
+- [ ] GSettings schema (`io.github.openapi.Gknowledge`): window size, maximized, last project, provider; install and compile it in `make install` and the Flatpak.
 - [ ] Register projects with `Gtk.RecentManager`.
 - [ ] `Gio.Notification` when ingestion finishes or fails.
 - [ ] Drag and drop of files and folders onto the Sources pane.

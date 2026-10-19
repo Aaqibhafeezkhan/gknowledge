@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="data/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg" alt="" width="96">
+  <img src="data/icons/hicolor/scalable/apps/io.github.openapi.Gknowledge.svg" alt="" width="96">
 </p>
 
 <h1 align="center">gknowledge</h1>
@@ -65,12 +65,12 @@ sudo apt update && sudo apt install gknowledge
 **On any distribution, with Flatpak** (the GNOME runtime comes from Flathub):
 
 ```bash
-flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
+flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref
 ```
 
 Both repositories are described at [openapi.github.io/gknowledge](https://openapi.github.io/gknowledge).
 
-Then open **gknowledge** from the app grid. To remove it: `sudo apt remove gknowledge` (or `flatpak uninstall io.gknowledge.Gknowledge`).
+Then open **gknowledge** from the app grid. To remove it: `sudo apt remove gknowledge` (or `flatpak uninstall io.github.openapi.Gknowledge`).
 
 <details>
 <summary>Other distributions, from source, and release builds</summary>

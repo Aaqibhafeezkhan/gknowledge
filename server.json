@@ -8,13 +8,13 @@
     "source": "github"
   },
   "websiteUrl": "https://openapi.github.io/gknowledge",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "gknowledge-mcp",
-      "version": "0.2.2",
+      "version": "0.3.0",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"

@@ -145,7 +145,14 @@ class Store:
         self.path = Path(db_path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = _SharedConnection(str(self.path))
-        self._conn.execute("PRAGMA journal_mode=WAL")
+        # No WAL: its shared-memory index needs mmap, which the Flatpak
+        # document portal (projects picked with the file chooser) does not
+        # support, so a WAL database there fails with "disk I/O error" even
+        # to open. Exclusive locking lets SQLite read an older WAL database
+        # without that index long enough to convert it.
+        self._conn.execute("PRAGMA locking_mode=EXCLUSIVE")
+        self._conn.execute("PRAGMA journal_mode=DELETE")
+        self._conn.execute("PRAGMA locking_mode=NORMAL")
         self._conn.execute("PRAGMA foreign_keys=ON")
         self._migrate()
 
