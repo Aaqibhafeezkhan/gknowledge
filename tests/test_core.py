@@ -297,6 +297,25 @@ def test_lint_flags_and_refreshes_sources_whose_original_changed(tmp_path):
     proj.close()
 
 
+def test_store_converts_a_wal_database(tmp_path):
+    """Older projects used WAL, which the Flatpak document portal cannot open."""
+    import sqlite3
+    proj = make_project(tmp_path)
+    db = proj.store.path
+    proj.close()
+    conn = sqlite3.connect(db)
+    assert conn.execute("PRAGMA journal_mode=WAL").fetchone()[0] == "wal"
+    conn.close()
+
+    proj = Project.open(tmp_path / "proj")
+    mode = proj.store._conn.execute("PRAGMA journal_mode").fetchone()[0]
+    assert mode == "delete"
+    other = sqlite3.connect(db)  # the MCP server opens the same file
+    assert other.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 0
+    other.close()
+    proj.close()
+
+
 if __name__ == "__main__":  # allow running without pytest
     import tempfile
 
@@ -307,7 +326,8 @@ if __name__ == "__main__":  # allow running without pytest
                      ("d", test_import_and_ingest_epub),
                      ("e", test_reingest_clears_stale_pages_and_rebuilds_source),
                      ("f", test_remove_source_detaches_shared_pages_and_deletes_orphans),
-                     ("g", test_lint_flags_and_refreshes_sources_whose_original_changed)):
+                     ("g", test_lint_flags_and_refreshes_sources_whose_original_changed),
+                     ("h", test_store_converts_a_wal_database)):
         d = tmp / name
         d.mkdir(parents=True, exist_ok=True)
         fn(d)

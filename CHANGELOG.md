@@ -16,6 +16,7 @@ All notable changes to gknowledge. Dates are release dates.
 **Packaging**
 - New app ID `io.github.openapi.Gknowledge` (was `io.gknowledge.Gknowledge`, a domain we do not own). Flatpak installs from the Pages remote move to the new ID on `flatpak update`, settings included.
 - Flatpak: install from the signed remote with `flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref`; GNOME 51 runtime, no home-folder access (files are opened through portals).
+- Flatpak: creating or opening a project in a folder picked with the file chooser failed with "disk I/O error": SQLite's WAL mode cannot run on the document portal. Projects now use a classic journal, and older projects are converted when opened.
 - Flatpak: PDF import works (pypdf is now bundled).
 - Signed APT repository on GitHub Pages, and a Debian source package.
 - `gknowledge-mcp` on PyPI (`uvx gknowledge-mcp`) and in the official MCP registry.

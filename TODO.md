@@ -9,7 +9,8 @@ Source: [comment by Justin (@fromthearchitect)](https://dev.to/fromthearchitect/
 Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE users)
 - [x] Flatpak build is green in CI (`appstreamcli compose` succeeds since the GNOME 51 bump); every release attaches a bundle and `repos.yml` publishes the remote at `openapi.github.io/gknowledge` (closes #24).
 - [x] `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref` works on Ubuntu (2026-10-19): pulls GNOME 51 from Flathub, installs 0.2.2, the app launches.
-- [ ] Inside the Flatpak: create a project, import through the portal, ingest, reopen after a restart.
+- [x] Inside the Flatpak, New Project failed with "disk I/O error" (SQLite WAL needs shared memory the document portal does not provide); the store no longer uses WAL and converts old databases. Project creation, PDF/Markdown import, ingest, query and drift check verified on a portal path (2026-10-19).
+- [ ] Inside the Flatpak, by hand: create a project, import through the file chooser, ingest, reopen after a restart.
 - [ ] Verify on a non-Ubuntu distro (Fedora VM or toolbox) before replying to Justin.
 - [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
 - [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Builds green on PR #42.
