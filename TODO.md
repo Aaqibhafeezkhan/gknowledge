@@ -13,8 +13,8 @@ Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE use
 - [ ] Verify on a non-Ubuntu distro (Fedora VM or toolbox) before replying to Justin.
 - [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
 - [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Builds green on PR #42.
-- [ ] Push a release so the published bundle includes the stale-source check, then tag the remote as tested.
-- [ ] Make the CI and release Flatpak jobs blocking (drop `continue-on-error`) now that they pass.
+- [ ] Release 0.3.0 (prepared 2026-10-19: version, CHANGELOG, MetaInfo, release notes with the Flatpak line): test the CI bundle end to end, merge, tag `v0.3.0`, then reinstall from the Pages remote and check `flatpak update`.
+- [x] CI and release Flatpak jobs are blocking (no `continue-on-error`); CI uploads an installable `gknowledge-dev.flatpak` artifact for every PR.
 - [ ] Flathub itself stays paused (AI-assisted code policy, see P0 below); say so plainly if asked, and point to the Pages remote.
 
 Develop against the runtime users get

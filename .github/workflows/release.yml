@@ -25,7 +25,6 @@ jobs:
   flatpak-bundle:
     needs: deb          # avoid two jobs racing to create the same release
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -34,7 +33,8 @@ jobs:
           flatpak install --user -y flathub org.gnome.Platform//51 org.gnome.Sdk//51
       - run: |
           flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.gknowledge.Gknowledge.yaml
-          flatpak build-bundle repo gknowledge-${GITHUB_REF_NAME}.flatpak io.gknowledge.Gknowledge
+          flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+            repo gknowledge-${GITHUB_REF_NAME}.flatpak io.gknowledge.Gknowledge
       - uses: softprops/action-gh-release@v2
         with:
           files: gknowledge-*.flatpak

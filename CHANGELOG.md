@@ -2,6 +2,24 @@
 
 All notable changes to gknowledge. Dates are release dates.
 
+## 0.3.0 — 2026-10-19
+
+**Wiki**
+- gknowledge notices when a source's original file changed after it was ingested. The source is marked "changed since ingest", and **Update** takes the new version and extracts it again, so pages stop describing an old version of the document.
+- Re-ingest and remove a source; pages backed only by that source are removed, shared pages keep their other sources (thanks @Aaqibhafeezkhan, #30).
+- MCP: new `stale_sources` tool, so agents can check the wiki for drift.
+
+**App**
+- Clicking a document in the sidebar opens it, in every section (it only highlighted the row before).
+- Preferences: wider dialog; provider and model names are no longer cut off.
+
+**Packaging**
+- Flatpak: install from the signed remote with `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref`; GNOME 51 runtime, no home-folder access (files are opened through portals).
+- Flatpak: PDF import works (pypdf is now bundled).
+- Signed APT repository on GitHub Pages, and a Debian source package.
+- `gknowledge-mcp` on PyPI (`uvx gknowledge-mcp`) and in the official MCP registry.
+- `make start-flatpak` runs the development loop inside the GNOME runtime.
+
 ## 0.2.2 — 2026-10-13
 
 **Packaging**
