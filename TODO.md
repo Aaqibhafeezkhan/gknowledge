@@ -2,6 +2,37 @@
 
 Actionable backlog derived from [`ROADMAP.md`](ROADMAP.md). Ordered by what unblocks the first 100 stars. `[ ]` open, `[x]` done.
 
+## Feedback from dev.to: Flatpak first, drift over hallucination (2026-10-17)
+
+Source: [comment by Justin (@fromthearchitect)](https://dev.to/fromthearchitect/comment/3i4d5) on the launch article. Data/AI architect on Fedora, writing a GNOME photo app in Rust; starred the repo and will try gknowledge "once a Flatpak is available". Follow-up is tracked in `DISTRIBUTING.md` §8.1 (dev.to row).
+
+Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE users)
+- [x] Flatpak build is green in CI (`appstreamcli compose` succeeds since the GNOME 51 bump); every release attaches a bundle and `repos.yml` publishes the remote at `openapi.github.io/gknowledge` (closes #24).
+- [x] `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref` works on Ubuntu (2026-10-19): pulls GNOME 51 from Flathub, installs 0.2.2, the app launches.
+- [ ] Inside the Flatpak: create a project, import through the portal, ingest, reopen after a restart.
+- [ ] Verify on a non-Ubuntu distro (Fedora VM or toolbox) before replying to Justin.
+- [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
+- [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Needs a green CI build.
+- [ ] Push a release so the published bundle includes the stale-source check, then tag the remote as tested.
+- [ ] Make the CI and release Flatpak jobs blocking (drop `continue-on-error`) now that they pass.
+- [ ] Flathub itself stays paused (AI-assisted code policy, see P0 below); say so plainly if asked, and point to the Pages remote.
+
+Develop against the runtime users get
+- [x] `make start-flatpak`: the `make start` loop run inside `org.gnome.Platform` (version read from the manifest), so host GTK/libadwaita differences show up before release.
+- [x] CONTRIBUTING documents `make start-flatpak`.
+- [ ] With Justin's permission, link his GNOME SDK setup write-up from CONTRIBUTING.
+
+Drift, not hallucination
+- [x] `core/lint.py`: `ChangeDetector` flags ingested sources whose original file no longer matches the ingested hash, with the pages that cite them.
+- [x] `IngestionManager.refresh_source()`: copy the new version, update hash and size, re-ingest (builds on #30's `reingest_source`).
+- [x] UI: changed sources show "changed since ingest" with a warning icon; the Re-ingest button becomes "Update"; a toast on project open and when the window regains focus.
+- [x] MCP tool `stale_sources` so agents can run the lint step of Karpathy's pattern.
+- [ ] Open a GitHub issue describing the design, credit the suggestion, invite Justin's review.
+- [ ] Mark affected pages as possibly outdated in the Knowledge pane (badge on the page, note in the page header).
+- [ ] Trigger the check from `Gio.FileMonitor` on origin files (#3) instead of only on open and focus.
+- [ ] Sources imported through the document portal: confirm `origin_path` stays readable across sessions inside the Flatpak.
+- [ ] Emit drift as review items once the Review queue is split (#17).
+
 ## UX review with a real ChatGPT plan (2026-10-13)
 
 Test: 6 short AI-paper notes (about 300 words each), provider "ChatGPT plan", model picked automatically (gpt-6.1-sol).
@@ -58,7 +89,7 @@ Speed and feedback
 - [ ] Decide the app ID (`io.github.<owner>.Gknowledge` or a verified domain). `io.gknowledge.*` needs a domain we control.
 - [x] Bump the runtime to GNOME 51 (current stable on Flathub). Not yet built in CI.
 - [x] Replace `--filesystem=home` with FileChooser / Documents portals; keep only `--share=network`. Done in the manifest, untested in a real Flatpak build.
-- [ ] Build from `git`/`archive` sources instead of `type: dir`; vendor `pypdf`.
+- [ ] Build from `git`/`archive` sources instead of `type: dir` (`pypdf` vendored).
 - [ ] Complete MetaInfo: screenshots (URLs still missing; developer, urls, branding added), `developer`, `url`, branding colors, release notes, summary of 35 characters or fewer.
 - [ ] Make `flatpak-builder-lint` pass with no exceptions.
 - [ ] Add a `.doap` file. (CI workflows for tests, metadata validation and Flatpak build exist; Flatpak job is non-blocking until proven.)
@@ -92,7 +123,7 @@ Speed and feedback
 - [ ] "Insights" panel: weakly connected pages, hubs, suggested missing topics.
 
 ### Lint
-- [ ] `core/lint.py`: orphan pages, duplicate titles, missing sources, stale pages, broken `[[links]]`.
+- [ ] `core/lint.py`: orphan pages, duplicate titles, missing sources, broken `[[links]]` (stale sources done, see the dev.to feedback section).
 - [ ] Optional LLM contradiction check.
 - [ ] Emit lint findings as review items.
 - [ ] Append every lint run to `knowledge/log.md` using the parseable `## [date] op | title` prefix.
@@ -165,10 +196,10 @@ Tasks:
 - [x] `build-aux/arch/PKGBUILD` ready for AUR (needs a tag and `updpkgsums`).
 - [x] `build-aux/snap/snapcraft.yaml` draft (untested).
 - [x] First release `v0.1.0` (2026-10-13) with `.deb`, version-independent `gknowledge_all.deb` and `install.sh` (`curl … | bash`).
-- [ ] Fix the Flatpak build: `appstreamcli compose` fails with `file-read-error` on the MetaInfo (the CI job hides it with `continue-on-error`).
+- [x] Fix the Flatpak build: `appstreamcli compose` succeeds in CI since 2026-10-19 (run 39223882741).
 - [ ] Test `sudo apt install ./gknowledge_all.deb` on a clean Ubuntu 24.04 VM.
 - [ ] Publish a signed APT repository on GitHub Pages (reprepro or aptly) and document `curl | gpg --dearmor` setup.
-- [ ] Publish a Flatpak OSTree repo on GitHub Pages with a `.flatpakrepo` file; document `flatpak remote-add`.
+- [x] Publish a Flatpak OSTree repo on GitHub Pages with a `.flatpakrepo` file; document `flatpak remote-add` (README documents the `.flatpakref` install).
 - [ ] Register `gknowledge` on the Snap Store and test the snap on Ubuntu 24.04; decide on `home` plug vs portals.
 - [ ] Create a Launchpad account and PPA; upload a source package (`debian/` with debhelper).
 - [ ] Submit AUR package.

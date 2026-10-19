@@ -33,7 +33,7 @@
   <img alt="Karpathy LLM Wiki pattern" src="https://img.shields.io/badge/pattern-Karpathy%20LLM%20Wiki-f59e0b?style=flat-square">
   <img alt="Sign in with ChatGPT" src="https://img.shields.io/badge/Sign%20in%20with-ChatGPT-10a37f?style=flat-square&logo=openai&logoColor=white">
   <img alt="Ollama" src="https://img.shields.io/badge/Ollama-supported-000000?style=flat-square">
-  <img alt="Flatpak planned" src="https://img.shields.io/badge/Flatpak-planned-4a86cf?style=flat-square&logo=flatpak&logoColor=white">
+  <img alt="Flatpak" src="https://img.shields.io/badge/Flatpak-available-4a86cf?style=flat-square&logo=flatpak&logoColor=white">
   <img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square">
 </p>
 
@@ -179,7 +179,7 @@ Nothing is sent anywhere unless you pick a provider that is not offline.
 | Native GNOME / GTK 4 | **yes** | Tauri | Tauri | Electron | Electron | web + Electron |
 | Works offline, no key | **yes** | needs a model | AI optional | agent-driven | local model | self-host |
 | Plain Markdown vault | **yes** | yes | yes | yes | yes | reads yours |
-| Linux packaging | `.deb`, Flatpak planned | `.deb`, AppImage | AppImage, `.deb` | `.deb`, `.rpm` | AppImage | pip, Docker |
+| Linux packaging | `.deb`, Flatpak | `.deb`, AppImage | AppImage, `.deb` | `.deb`, `.rpm` | AppImage | pip, Docker |
 | License | MIT | GPL-3.0 | AGPL-3.0 | GPL-3.0 | AGPL-3.0 | AGPL-3.0 |
 
 Details and history of each project are in [`DISTRIBUTING.md`](DISTRIBUTING.md).

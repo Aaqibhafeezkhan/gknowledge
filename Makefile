@@ -18,13 +18,14 @@ METAINFODIR := $(DATADIR)/metainfo
 
 INSTALL     := install
 
-.PHONY: all help check test run dev start demo-svg install uninstall clean dist pypi flatpak
+.PHONY: all help check test run dev start start-flatpak demo-svg install uninstall clean dist pypi flatpak
 
 all: help
 
 help:
 	@echo "gknowledge — targets:"
 	@echo "  make start      Dev loop: run on a demo project and auto-restart on source changes"
+	@echo "  make start-flatpak  Same loop, but inside the GNOME runtime Flatpak users get"
 	@echo "  make run        Run the app from the source tree (opens your last project)"
 	@echo "  make test       Run the headless core test suite"
 	@echo "  make check      Byte-compile all sources (syntax check)"
@@ -62,6 +63,25 @@ start:
 		$(PYTHON) build-aux/dev/seed_demo.py $(DEMO); \
 	fi
 	XDG_CONFIG_HOME=$(CURDIR)/$(SANDBOX)/config $(PYTHON) build-aux/dev/watch.py $(DEMO)
+
+# The same loop inside the Flatpak runtime: the host GTK and libadwaita can
+# differ from what Flatpak users run, so check UI work here before a release.
+# The runtime version is read from the manifest to keep the two in sync.
+RUNTIME     := org.gnome.Platform//$(shell sed -n "s/^runtime-version: *'\(.*\)'/\1/p" build-aux/flatpak/$(APP_ID).yaml)
+
+start-flatpak:
+	@flatpak info --user $(RUNTIME) >/dev/null 2>&1 || flatpak info $(RUNTIME) >/dev/null 2>&1 || { \
+		echo ">> Missing runtime. Install it with:"; \
+		echo "   flatpak install --user flathub $(RUNTIME)"; exit 1; }
+	@mkdir -p $(SANDBOX)/config
+	@if [ ! -f $(DEMO)/gknowledge.json ]; then \
+		echo ">> Creating and ingesting demo project in $(DEMO)"; \
+		$(PYTHON) build-aux/dev/seed_demo.py $(DEMO); \
+	fi
+	flatpak run --share=network --share=ipc --socket=wayland --socket=fallback-x11 \
+		--device=dri --own-name=$(APP_ID) --filesystem=$(CURDIR) --cwd=$(CURDIR) \
+		--env=XDG_CONFIG_HOME=$(CURDIR)/$(SANDBOX)/config \
+		--command=python3 $(RUNTIME) build-aux/dev/watch.py $(DEMO)
 
 install:
 	@echo ">> Installing gknowledge into $(DESTDIR)$(PREFIX)"

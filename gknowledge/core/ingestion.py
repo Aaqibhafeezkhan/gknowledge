@@ -23,6 +23,7 @@ from . import parsers
 from .extraction import ExtractionPipeline
 from .hashing import hash_file
 from .knowledge import KnowledgeWriter
+from .lint import origin_of
 from .models import Job, JobState, PageKind, Source, SourceStatus, new_id, now
 from .project import Project
 
@@ -125,6 +126,37 @@ class IngestionManager:
         writer.rebuild_overview()
         writer.append_log("re-ingest", source.title)
         return source
+
+    def refresh_source(self, source_id: str) -> Source | None:
+        """Take the current content of a source's original file and re-ingest it.
+
+        Used when lint reports the original changed after ingestion: the stored
+        copy is replaced, the hash updated, and the old knowledge detached.
+        """
+        if self.is_running():
+            raise RuntimeError("Cannot refresh a source while ingestion is running.")
+        source = self.store.get_source(source_id)
+        if source is None:
+            return None
+        origin = origin_of(source)
+        if origin is None:
+            raise FileNotFoundError(f"Original file is missing: {source.origin_path}")
+        digest = hash_file(origin)
+        other = self.store.source_by_hash(digest)
+        if other and other.id != source.id:
+            raise ValueError(f"Same content is already imported as “{other.title}”.")
+
+        old_path = self._managed_path(self.project.sources_dir, source.rel_path)
+        dest = self.project.sources_dir / f"{origin.stem}-{digest[:8]}{origin.suffix}"
+        shutil.copy2(origin, dest)
+        if old_path is not None and old_path.is_file() and old_path != dest.resolve():
+            old_path.unlink()
+        source.rel_path = dest.name
+        source.sha256 = digest
+        source.size = dest.stat().st_size
+        self.store.upsert_source(source)
+        self.store.log("source.refresh", source.title)
+        return self.reingest_source(source.id)
 
     def remove_source(self, source_id: str) -> Source | None:
         """Remove the source and clean up knowledge no longer backed by it."""

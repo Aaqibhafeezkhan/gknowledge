@@ -21,6 +21,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .core import lint
 from .core.ingestion import IngestionManager
 from .core.knowledge import KnowledgeWriter
 from .core.project import Project
@@ -72,6 +73,13 @@ TOOLS = [
             "path": {"type": "string", "description": "Absolute path of the file"},
             "ingest": {"type": "boolean", "default": True}},
             "required": ["path"]},
+    },
+    {
+        "name": "stale_sources",
+        "description": "Lint the wiki for drift: sources whose original file changed "
+                       "after ingestion, with the pages that still reflect the old "
+                       "version. Re-import or refresh them in the app.",
+        "inputSchema": {"type": "object", "properties": {}},
     },
     {
         "name": "recent_activity",
@@ -142,6 +150,17 @@ class WikiServer:
         mgr.process_pending(progress=lambda ev, _j, msg: notes.append(f"{ev}: {msg}")
                             if ev in ("done", "warning", "error") else None)
         return "\n".join(notes) or "Imported."
+
+    def stale_sources(self) -> str:
+        stale = lint.stale_sources(self.project)
+        if not stale:
+            return "No drift: every ingested source matches its original file."
+        out = []
+        for s in stale:
+            out.append(f"- {s.source.title} ({s.source.origin_path}) changed since ingest; "
+                       f"{len(s.pages)} page(s) may be outdated:")
+            out += [f"  - {p.slug}" for p in s.pages]
+        return "\n".join(out)
 
     def recent_activity(self, limit: int = 20) -> str:
         rows = self.project.store.recent_log(int(limit))

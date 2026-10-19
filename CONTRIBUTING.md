@@ -8,6 +8,14 @@ Thanks for helping. The project is young, so small, focused contributions are th
 sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1   # Debian/Ubuntu
 make test    # headless core tests, no GTK or network needed
 make run     # run from the source tree
+make start   # dev loop on a demo project, restarts on every save
+```
+
+Flatpak users get the GTK and libadwaita of the GNOME runtime, not yours. Before submitting UI work, run the same dev loop inside that runtime (the version is read from the Flatpak manifest):
+
+```bash
+flatpak install --user flathub org.gnome.Platform//51   # once
+make start-flatpak
 ```
 
 ## Ground rules
