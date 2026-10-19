@@ -13,6 +13,7 @@ from gi.repository import Adw, Gio, GLib, GObject, Gtk, Pango  # noqa: E402
 from .. import APP_NAME, __version__
 from ..core.ingestion import IngestionManager
 from ..core.knowledge import KnowledgeWriter
+from ..core.lint import ChangeDetector
 from ..core.models import JobState, PageKind, Source
 from ..core.project import Project
 from ..core.query import QueryEngine
@@ -78,6 +79,10 @@ class MainWindow(Adw.ApplicationWindow):
         self.app = app
         self.project: Project | None = None
         self.ingestion: IngestionManager | None = None
+        self.changes: ChangeDetector | None = None
+        self._stale_ids: set[str] = set()
+        # Sources are often edited in another app: look for drift on return.
+        self.connect("notify::is-active", self._on_active_changed)
         self._selected_source_id: str | None = None
         self.provider = None
 
@@ -283,6 +288,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.project = project
         self.provider = build_provider(project.settings.as_dict())
         self.ingestion = IngestionManager(project, self.provider)
+        self.changes = ChangeDetector(project)
 
         for stack in (self.side_stack, self.view_stack):
             while (child := stack.get_first_child()) is not None:
@@ -308,6 +314,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.refresh_all()
         self.view_stack.set_visible_child_name("sources")
         self._sync_sidebar()
+        self._announce_stale()
 
     def on_settings_saved(self, settings):
         if self.project:
@@ -377,13 +384,17 @@ class MainWindow(Adw.ApplicationWindow):
             self._update_source_action_buttons()
             return
         sources = self.project.store.list_sources()
+        self._stale_ids = self._find_stale()
         selected_row = None
         if not sources:
             self.sources_list.append(_placeholder_row("No sources yet. Import some."))
         for s in sources:
+            stale = s.id in self._stale_ids
             row = Adw.ActionRow(activatable=True, title=GLib.markup_escape_text(s.title),
-                                subtitle=s.status.value)
-            row.add_prefix(Gtk.Image.new_from_icon_name("text-x-generic-symbolic"))
+                                subtitle="changed since ingest" if stale
+                                else s.status.value)
+            row.add_prefix(Gtk.Image.new_from_icon_name(
+                "dialog-warning-symbolic" if stale else "text-x-generic-symbolic"))
             row.source = s
             self.sources_list.append(row)
             if s.id == self._selected_source_id:
@@ -423,6 +434,11 @@ class MainWindow(Adw.ApplicationWindow):
         )
         if hasattr(self, "reingest_btn"):
             self.reingest_btn.set_sensitive(available)
+            stale = self._selected_source_id in self._stale_ids
+            self.reingest_btn.set_label("Update" if stale else "Re-ingest")
+            self.reingest_btn.set_tooltip_text(
+                "The original file changed: ingest the new version" if stale
+                else "Extract this source again")
         if hasattr(self, "remove_source_btn"):
             self.remove_source_btn.set_sensitive(available)
 
@@ -678,8 +694,12 @@ class MainWindow(Adw.ApplicationWindow):
     def _on_reingest_source(self, *_a):
         if not (self.project and self.ingestion and self._selected_source_id):
             return
+        source_id = self._selected_source_id
         try:
-            source = self.ingestion.reingest_source(self._selected_source_id)
+            if source_id in self._stale_ids:
+                source = self.ingestion.refresh_source(source_id)
+            else:
+                source = self.ingestion.reingest_source(source_id)
         except (OSError, RuntimeError, ValueError) as exc:
             self.toast(f"Could not re-ingest source: {exc}")
             return
@@ -765,6 +785,25 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.ingestion.start(progress=progress, on_finish=finished)
         self._update_source_action_buttons()
+
+    # -- drift ---------------------------------------------------------------
+    def _find_stale(self) -> set[str]:
+        if not self.changes:
+            return set()
+        return {s.source.id for s in self.changes.stale_sources()}
+
+    def _announce_stale(self):
+        n = len(self._stale_ids)
+        if n:
+            self.toast(f"{n} source(s) changed since they were ingested")
+
+    def _on_active_changed(self, *_a):
+        if not (self.is_active() and self.project and self.ingestion
+                and not self.ingestion.is_running()):
+            return
+        if self._find_stale() != self._stale_ids:
+            self._refresh_sources()
+            self._announce_stale()
 
     # -- helpers -------------------------------------------------------------
     def _warn(self, text: str):
