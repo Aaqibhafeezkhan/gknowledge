@@ -381,7 +381,7 @@ class MainWindow(Adw.ApplicationWindow):
         if not sources:
             self.sources_list.append(_placeholder_row("No sources yet. Import some."))
         for s in sources:
-            row = Adw.ActionRow(title=GLib.markup_escape_text(s.title),
+            row = Adw.ActionRow(activatable=True, title=GLib.markup_escape_text(s.title),
                                 subtitle=s.status.value)
             row.add_prefix(Gtk.Image.new_from_icon_name("text-x-generic-symbolic"))
             row.source = s
@@ -473,7 +473,7 @@ class MainWindow(Adw.ApplicationWindow):
         order = {k: i for i, k in enumerate(_KIND_ORDER)}
         pages.sort(key=lambda p: (order.get(p.kind, 99), p.title.lower()))
         for p in pages:
-            row = Adw.ActionRow(title=GLib.markup_escape_text(p.title), title_lines=1,
+            row = Adw.ActionRow(activatable=True, title=GLib.markup_escape_text(p.title), title_lines=1,
                                 tooltip_text=p.title)
             row.add_prefix(Gtk.Image.new_from_icon_name(
                 _KIND_ICON.get(p.kind, "text-x-generic-symbolic")))
@@ -531,7 +531,7 @@ class MainWindow(Adw.ApplicationWindow):
             self.answers_list.append(_placeholder_row("No saved answers yet."))
             return
         for p in answers:
-            row = Adw.ActionRow(title=GLib.markup_escape_text(p.title),
+            row = Adw.ActionRow(activatable=True, title=GLib.markup_escape_text(p.title),
                                 subtitle="saved answer")
             row.add_prefix(Gtk.Image.new_from_icon_name("help-about-symbolic"))
             row.page = p
@@ -619,6 +619,7 @@ class MainWindow(Adw.ApplicationWindow):
             return
         for item in items:
             row = Adw.ActionRow(
+                activatable=True,
                 title=GLib.markup_escape_text(item.title),
                 subtitle=f"{item.action.value} · {item.detail}")
             btn = Gtk.Button(label="Resolve", valign=Gtk.Align.CENTER)
