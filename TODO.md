@@ -12,7 +12,7 @@ Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE use
 - [ ] Inside the Flatpak: create a project, import through the portal, ingest, reopen after a restart.
 - [ ] Verify on a non-Ubuntu distro (Fedora VM or toolbox) before replying to Justin.
 - [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
-- [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Needs a green CI build.
+- [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Builds green on PR #42.
 - [ ] Push a release so the published bundle includes the stale-source check, then tag the remote as tested.
 - [ ] Make the CI and release Flatpak jobs blocking (drop `continue-on-error`) now that they pass.
 - [ ] Flathub itself stays paused (AI-assisted code policy, see P0 below); say so plainly if asked, and point to the Pages remote.
@@ -27,7 +27,7 @@ Drift, not hallucination
 - [x] `IngestionManager.refresh_source()`: copy the new version, update hash and size, re-ingest (builds on #30's `reingest_source`).
 - [x] UI: changed sources show "changed since ingest" with a warning icon; the Re-ingest button becomes "Update"; a toast on project open and when the window regains focus.
 - [x] MCP tool `stale_sources` so agents can run the lint step of Karpathy's pattern.
-- [ ] Open a GitHub issue describing the design, credit the suggestion, invite Justin's review.
+- [x] Design written up in PR #42, crediting the suggestion; invite Justin to review it when replying.
 - [ ] Mark affected pages as possibly outdated in the Knowledge pane (badge on the page, note in the page header).
 - [ ] Trigger the check from `Gio.FileMonitor` on origin files (#3) instead of only on open and focus.
 - [ ] Sources imported through the document portal: confirm `origin_path` stays readable across sessions inside the Flatpak.
