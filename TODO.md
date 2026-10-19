@@ -10,11 +10,11 @@ Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE use
 - [x] Flatpak build is green in CI (`appstreamcli compose` succeeds since the GNOME 51 bump); every release attaches a bundle and `repos.yml` publishes the remote at `openapi.github.io/gknowledge` (closes #24).
 - [x] `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref` works on Ubuntu (2026-10-19): pulls GNOME 51 from Flathub, installs 0.2.2, the app launches.
 - [x] Inside the Flatpak, New Project failed with "disk I/O error" (SQLite WAL needs shared memory the document portal does not provide); the store no longer uses WAL and converts old databases. Project creation, PDF/Markdown import, ingest, query and drift check verified on a portal path (2026-10-19).
-- [ ] Inside the Flatpak, by hand: create a project, import through the file chooser, ingest, reopen after a restart.
+- [x] Inside the Flatpak, by hand: create a project, import through the file chooser, ingest, reopen after a restart (2026-10-19).
 - [ ] Verify on a non-Ubuntu distro (Fedora VM or toolbox) before replying to Justin.
 - [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
 - [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Builds green on PR #42.
-- [ ] Release 0.3.0 (prepared 2026-10-19: version, CHANGELOG, MetaInfo, release notes with the Flatpak line): test the CI bundle end to end, merge, tag `v0.3.0`, then reinstall from the Pages remote and check `flatpak update`.
+- [x] Release 0.3.0, tagged 2026-10-19: `.deb` and `.flatpak` on the release, `gknowledge-mcp` 0.3.0 on PyPI. A fresh install from the Pages flatpakref works, and the old ID's ref carries the end-of-life-rebase to the new one.
 - [x] CI and release Flatpak jobs are blocking (no `continue-on-error`); CI uploads an installable `gknowledge-dev.flatpak` artifact for every PR.
 - [ ] Flathub itself stays paused (AI-assisted code policy, see P0 below); say so plainly if asked, and point to the Pages remote.
 
@@ -93,7 +93,7 @@ Speed and feedback
 - [ ] Build from `git`/`archive` sources instead of `type: dir` (`pypdf` vendored).
 - [ ] Complete MetaInfo: screenshots (URLs still missing; developer, urls, branding added), `developer`, `url`, branding colors, release notes, summary of 35 characters or fewer.
 - [ ] Make `flatpak-builder-lint` pass with no exceptions.
-- [ ] Add a `.doap` file. (CI workflows for tests, metadata validation and Flatpak build exist; Flatpak job is non-blocking until proven.)
+- [ ] Add a `.doap` file. (CI workflows for tests, metadata validation and Flatpak build exist; Flatpak job is blocking since 0.3.0.)
 - [ ] Open the `flathub/flathub` submission PR; verify the developer at merge.
 
 ## P0b: GNOME and Ubuntu integration (gedit-style)
@@ -210,7 +210,7 @@ Tasks:
 
 ## Distribution and community
 
-- [ ] Release workflow exists (`.github/workflows/release.yml`, builds a `.flatpak` bundle on `v*` tags); push the first tag once the Flatpak build is verified.
+- [x] Release workflow exists (`.github/workflows/release.yml`, builds a `.flatpak` bundle on `v*` tags); first verified Flatpak release is v0.3.0.
 - [ ] AUR package (`gknowledge`), ideally maintained by a second person.
 - [ ] Release notes in MetaInfo for every release; monthly cadence at least.
 - [ ] Announce on This Week in GNOME via `#thisweek:gnome.org` the week of the Flathub merge.
