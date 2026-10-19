@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="data/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg" alt="" width="96">
+  <img src="data/icons/hicolor/scalable/apps/io.github.openapi.Gknowledge.svg" alt="" width="96">
 </p>
 
 <h1 align="center">gknowledge</h1>
@@ -42,7 +42,7 @@ sudo apt update && sudo apt install gknowledge
 En cualquier distribución, con Flatpak (el runtime de GNOME viene de Flathub):
 
 ```bash
-flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
+flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref
 ```
 
 ## Pensada para funcionar sin internet

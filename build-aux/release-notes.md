@@ -9,7 +9,7 @@ Or download `gknowledge_all.deb` below and run `sudo apt install ./gknowledge_al
 On any distribution with Flatpak (Fedora, Arch, openSUSE, …):
 
 ```bash
-flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
+flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref
 ```
 
 ## What's new

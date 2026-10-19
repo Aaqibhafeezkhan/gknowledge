@@ -32,9 +32,9 @@ jobs:
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
           flatpak install --user -y flathub org.gnome.Platform//51 org.gnome.Sdk//51
       - run: |
-          flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.gknowledge.Gknowledge.yaml
+          flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.github.openapi.Gknowledge.yaml
           flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
-            repo gknowledge-${GITHUB_REF_NAME}.flatpak io.gknowledge.Gknowledge
+            repo gknowledge-${GITHUB_REF_NAME}.flatpak io.github.openapi.Gknowledge
       - uses: softprops/action-gh-release@v2
         with:
           files: gknowledge-*.flatpak

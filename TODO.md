@@ -86,7 +86,7 @@ Speed and feedback
 - [ ] Publish a statement on AI-assisted code (Flathub and GNOME Circle have an AI-code policy since May 2026; this repo is developed with AI assistance and must say so plainly).
 
 ### Flatpak and Flathub (paused: kept warm, do not submit until policy allows AI-assisted code)
-- [ ] Decide the app ID (`io.github.<owner>.Gknowledge` or a verified domain). `io.gknowledge.*` needs a domain we control.
+- [x] App ID is `io.github.openapi.Gknowledge` since 0.3.0 (`io.gknowledge.*` used gknowledge.io, which nobody owns). The Pages remote rebases the old ID with end-of-life-rebase; `.desktop` has `X-Flatpak-RenamedFrom`, MetaInfo has `<replaces>`.
 - [x] Bump the runtime to GNOME 51 (current stable on Flathub). Not yet built in CI.
 - [x] Replace `--filesystem=home` with FileChooser / Documents portals; keep only `--share=network`. Done in the manifest, untested in a real Flatpak build.
 - [ ] Build from `git`/`archive` sources instead of `type: dir` (`pypdf` vendored).
@@ -100,7 +100,7 @@ Speed and feedback
 - [x] Keyboard accelerators for new/open/preferences/quit.
 - [x] Desktop entry advertises Markdown, text, PDF and HTML; files passed by the file manager are imported into the current project.
 - [x] About dialog points to the real repository and issue tracker.
-- [ ] GSettings schema (`io.gknowledge.Gknowledge`): window size, maximized, last project, provider; install and compile it in `make install` and the Flatpak.
+- [ ] GSettings schema (`io.github.openapi.Gknowledge`): window size, maximized, last project, provider; install and compile it in `make install` and the Flatpak.
 - [ ] Register projects with `Gtk.RecentManager`.
 - [ ] `Gio.Notification` when ingestion finishes or fails.
 - [ ] Drag and drop of files and folders onto the Sources pane.

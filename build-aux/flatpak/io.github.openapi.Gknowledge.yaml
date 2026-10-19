@@ -1,4 +1,4 @@
-app-id: io.gknowledge.Gknowledge
+app-id: io.github.openapi.Gknowledge
 runtime: org.gnome.Platform
 runtime-version: '51'
 sdk: org.gnome.Sdk

@@ -5,7 +5,7 @@
 # pip's externally-managed environment. Use PREFIX=/usr with sudo for a
 # system-wide install.
 
-APP_ID      := io.gknowledge.Gknowledge
+APP_ID      := io.github.openapi.Gknowledge
 PYTHON      ?= python3
 PREFIX      ?= $(HOME)/.local
 DESTDIR     ?=

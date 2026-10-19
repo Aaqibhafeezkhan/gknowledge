@@ -14,7 +14,8 @@ All notable changes to gknowledge. Dates are release dates.
 - Preferences: wider dialog; provider and model names are no longer cut off.
 
 **Packaging**
-- Flatpak: install from the signed remote with `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref`; GNOME 51 runtime, no home-folder access (files are opened through portals).
+- New app ID `io.github.openapi.Gknowledge` (was `io.gknowledge.Gknowledge`, a domain we do not own). Flatpak installs from the Pages remote move to the new ID on `flatpak update`, settings included.
+- Flatpak: install from the signed remote with `flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref`; GNOME 51 runtime, no home-folder access (files are opened through portals).
 - Flatpak: PDF import works (pypdf is now bundled).
 - Signed APT repository on GitHub Pages, and a Debian source package.
 - `gknowledge-mcp` on PyPI (`uvx gknowledge-mcp`) and in the official MCP registry.

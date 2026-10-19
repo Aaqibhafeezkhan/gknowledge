@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.gknowledge.Gknowledge</id>
+  <id>io.github.openapi.Gknowledge</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <name>gknowledge</name>
@@ -41,7 +41,10 @@
     <control>pointing</control>
     <control>touch</control>
   </supports>
-  <launchable type="desktop-id">io.gknowledge.Gknowledge.desktop</launchable>
+  <launchable type="desktop-id">io.github.openapi.Gknowledge.desktop</launchable>
+  <replaces>
+    <id>io.gknowledge.Gknowledge</id>
+  </replaces>
   <categories>
     <category>Office</category>
     <category>Utility</category>
