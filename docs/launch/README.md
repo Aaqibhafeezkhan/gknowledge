@@ -42,10 +42,11 @@ This replays the steps that took comparable projects from zero to thousands of s
 > - You can use your own ChatGPT Plus/Pro plan through OpenAI's new "Sign in with ChatGPT" for local apps, so there is no API key and nobody resells tokens. Ollama and any OpenAI-compatible endpoint work too.
 > - It avoids the usual LLM-wiki mess: no empty stub pages, duplicate names are merged, minor names stay mentions until a second source cites them.
 > - It ships an MCP server, so Claude Code or Codex can search and grow the same wiki.
+> - Pages go stale when their source changes, not because the model hallucinates: it flags sources whose original file changed since ingest and lets you update them.
 >
-> Install on Ubuntu/Debian: `curl -fsSL https://github.com/openapi/gknowledge/releases/latest/download/install.sh | bash`
+> Install on any distro with Flatpak: `flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref` (or a one-line `.deb` installer for Ubuntu/Debian).
 >
-> It's early (v0.2). I'd love feedback on the ingestion quality and on what you'd need to switch from Obsidian plus plugins.
+> It's early (v0.3). I'd love feedback on the ingestion quality and on what you'd need to switch from Obsidian plus plugins.
 
 ## X / Mastodon thread
 
@@ -53,7 +54,7 @@ This replays the steps that took comparable projects from zero to thousands of s
 2. No Electron, no Tauri: GTK 4 + Libadwaita. The wiki is a plain folder you can open in Obsidian.
 3. Bring your own brain: your ChatGPT plan via "Sign in with ChatGPT" (no API key), Ollama, or any OpenAI-compatible endpoint.
 4. Agents welcome: `claude mcp add gknowledge -- gknowledge-mcp ~/Knowledge/project`
-5. MIT licensed. One-line install for Ubuntu. ⭐ github.com/openapi/gknowledge
+5. MIT licensed. Flatpak for any distro, one-line install for Ubuntu. ⭐ github.com/openapi/gknowledge
 
 ## Reddit
 
@@ -66,7 +67,7 @@ Each post: one screenshot or the demo, two short paragraphs, the install line, a
 
 ## GNOME channels
 
-- **This Week in GNOME** (Matrix room `#thisweek:gnome.org`): "gknowledge 0.2 is out: a native GTK 4 and Libadwaita app that turns your documents into a linked, cited wiki, offline by default, with optional local or ChatGPT models."
+- **This Week in GNOME** (Matrix room `#thisweek:gnome.org`): "gknowledge 0.3 is out: a native GTK 4 and Libadwaita app that turns your documents into a linked, cited wiki, offline by default, with optional local or ChatGPT models. New in 0.3: a Flatpak for any distribution (`flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref`), PDF import inside the sandbox, and sources that changed since ingest are flagged so the pages built from them can be updated."
 - **Phoronix tip and OMG! Ubuntu tip:** link to the release page, the one-liner, and two screenshots.
 
 ## Chinese communities

@@ -296,7 +296,7 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 
 ## 8. Registro dei canali e delle ricerche già fatte
 
-> **Aggiornato al 14 ottobre 2026.** Questa sezione evita di ripetere le stesse indagini: elenca dove gknowledge è già stato proposto, con quale esito, quali piattaforme coprono i competitor e quali ricerche non hanno prodotto nulla. Prima di cercare nuovi canali, aggiornare questa sezione. I testi pronti da incollare sono in [`docs/launch/`](docs/launch/) (`directories.md`, `outreach.md`, `blog-post.md`, `zh.md`, `emerging.md`).
+> **Aggiornato al 14 ottobre 2026; il punto al 19 ottobre è in §10.** Questa sezione evita di ripetere le stesse indagini: elenca dove gknowledge è già stato proposto, con quale esito, quali piattaforme coprono i competitor e quali ricerche non hanno prodotto nulla. Prima di cercare nuovi canali, aggiornare questa sezione. I testi pronti da incollare sono in [`docs/launch/`](docs/launch/) (`directories.md`, `outreach.md`, `blog-post.md`, `zh.md`, `emerging.md`).
 
 ### 8.1 Stato delle candidature
 
@@ -310,7 +310,7 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 | OpenAlternative | directory | 14 ott 2026 | **non inviata**: servono 250★ per repo con meno di 6 mesi (50★ dal 7 gen 2027) e un sito su dominio proprio; le schede gratuite escono una al giorno lavorativo | riprovare con `gknowledge.io` attivo |
 | EveryDev.ai | directory di AI dev tools (c'è OpenKnowledge) | 14 ott 2026 | login GitHub fatto; serve completare l'onboarding del profilo prima di `/create/tool` | completare onboarding, poi compilare con `directories.md` |
 | ClaudeKit (claudekit.io) | sito coreano curato a mano di strumenti per Claude Code (c'è nashsu) | 14 ott 2026 | **non raggiungibile**: nessun form, repo o contatto | nessuno |
-| dev.to | articolo | 13 ott 2026 | [pubblicato](https://dev.to/francescobianco/i-turned-karpathys-llm-wiki-into-a-native-gnome-app-and-it-works-offline-130c). 17 ott: [commento di Justin (@fromthearchitect)](https://dev.to/fromthearchitect/comment/3i4d5), data/AI architect su Fedora che sta scrivendo un'app foto GNOME in Rust. Ha messo la stella; il `.deb` e `install.sh` non gli servono e chiede il Flatpak (non ha visto il remote su Pages: badge e tabella del README dicevano ancora "Flatpak planned"). Consiglia di sviluppare nel runtime GNOME e osserva che le pagine invecchiano per drift delle sorgenti, non per allucinazioni. Da qui nascono il controllo "stale sources" e `make start-flatpak` (PR #42, mergiato il 19 ott; il PR #43 corregge il click nella sidebar) | **rispondergli quando il Flatpak è verificato** su una distro non Ubuntu: ringraziare punto per punto, dargli la riga `flatpak install`, chiedergli di provarlo su Fedora, chiedere il permesso di linkare la sua guida al GNOME SDK in CONTRIBUTING, invitarlo sulla issue delle stale pages. Più avanti: cross-promozione tra app GNOME e, se il rapporto cresce, co-maintainer per il packaging (§6). Ripubblicare su Medium con canonical a dev.to |
+| dev.to | articolo | 13 ott 2026 | [pubblicato](https://dev.to/francescobianco/i-turned-karpathys-llm-wiki-into-a-native-gnome-app-and-it-works-offline-130c). 17 ott: [commento di Justin (@fromthearchitect)](https://dev.to/fromthearchitect/comment/3i4d5), data/AI architect su Fedora che sta scrivendo un'app foto GNOME in Rust. Ha messo la stella; il `.deb` e `install.sh` non gli servono e chiede il Flatpak (non ha visto il remote su Pages: badge e tabella del README dicevano ancora "Flatpak planned"). Consiglia di sviluppare nel runtime GNOME e osserva che le pagine invecchiano per drift delle sorgenti, non per allucinazioni. Da qui nascono il controllo "stale sources" e `make start-flatpak` (PR #42, mergiato il 19 ott; il PR #43 corregge il click nella sidebar) | **risposto il 19 ott** dall'utente, dopo il rilascio della 0.3.0 con il Flatpak; ringraziato anche nell'[annuncio della 0.3](https://github.com/orgs/openapi/discussions/72). **Lui ha risposto la sera del 19 ott** ([commento](https://dev.to/fromthearchitect/comment/3ia9i)): apprezza `stale_sources` via MCP e il fix WAL/document portal, autorizza il link alla [Parte 1](https://fromthearchitect.dev/posts/gnome-rust-part-1-getting-started/) della sua serie (aggiunto in CONTRIBUTING il 20 ott), proverà il Flatpak su Fedora 44 in settimana e aprirà issue (GitHub `justinf555`): smistarle per prime. Facoltativo: un breve "thanks, linked!" su dev.to. Più avanti: cross-promozione tra app GNOME e, se il rapporto cresce, co-maintainer per il packaging (§6). Ripubblicare su Medium con canonical a dev.to |
 | Theo James (Medium, editor di *Better Workflow*) | classifica "8 Apps… Karpathy-Style LLM Knowledge Base" | 14 ott 2026 | testo pronto in `outreach.md` (risposta all'articolo o pitch alla pubblicazione); nessun contatto esterno | inviare da account Medium |
 | Prahlad G. Menon (themenonlab.blog) | blog che ha coperto Tolaria e OKF | 14 ott 2026 | email pronta in `outreach.md` (prahlad.menon@quant.md) | inviare |
 | awesome-gnome (1.622★, c'è Newelle) | lista awesome | — | **saltata**: richiede release stabili mature | proporre dopo Flathub |
@@ -477,3 +477,64 @@ Il messaggio per questo pubblico è **offline, senza API a pagamento, su un port
 **Stima.** Con tutto il piano, la somma dei valori centrali è circa **+80–110 stelle**. Senza Show HN scende a **+45–70**: le 100 in 8 settimane diventano improbabili senza HN o un giorno in trending. L'alternativa a puntare tutto su HN è la combinazione Reddit + 48 ore concentrate.
 
 **Non conviene:** Lobsters (invito), altre liste awesome piccole, pubblicità, giveaway (vietati).
+
+## 10. Rilancio dopo la v0.3.0 (19 ottobre 2026)
+
+### 10.1 Cosa dicono davvero le statistiche
+
+| Giorno | Clone (unici) | Run di CI | Visite (unici) |
+|---|---|---|---|
+| 12 ott | 2 (2) | — | 1 (1) |
+| 13 ott | 304 (81) | 39 | 42 (6) |
+| 14 ott | 139 (61) | 4 | 11 (3) |
+| 15 ott | 94 (41) | 5 | 9 (4) |
+| 16 ott | 68 (32) | 3 | 46 (19) |
+| 17 ott | 20 (15) | — | 4 (3) |
+| 18 ott | 12 (9) | — | 6 (3) |
+
+Fonti: `gh api repos/openapi/gknowledge/traffic/clones`, `/traffic/views`, `gh run list`.
+
+- **I clone non misurano le persone.** Ogni `actions/checkout` conta come clone, e ogni runner come clone "unico". Il picco del 13 coincide con le 39 run di CI di quel giorno (v0.2.1, v0.2.2, i pacchetti `.deb`, il repository APT e il remote Flatpak); il calo segue la fine dei rilasci, non una perdita di pubblico. A questi si aggiungono mirror e scraper che clonano i repo appena entrano in una lista awesome. Da qui in avanti la metrica di riferimento sono **visite uniche e stelle**, non i clone.
+- **Il traffico umano è sempre stato basso**: 3–6 visitatori unici al giorno, con due picchi, il 13 (articolo dev.to) e il 16 (pubblicazione su PyPI e sul registro MCP, 19 unici). Referrer in 14 giorni: github.com 8 unici, alternativeto.net 3, Google 2, news.ycombinator.com 2.
+- **Stelle: 19** (15 al 15 ott). Le 4 nuove arrivano dalle liste awesome e dall'articolo dev.to (justinf555 il 17 ott è con ogni probabilità Justin di dev.to, che ha detto di aver messo la stella). Il primo contributo esterno di AdityaWagh06 (#1, #19) arriva da up-for-grabs o awesome-for-beginners.
+- **Nessuna delle candidature in attesa si è mossa**: awesome-for-beginners #2143, awesome-hacktoberfest-2026 #22, ollama #19001 e awesome-context-engineering #88 sono aperte senza commenti; HelloGitHub #3956, ruanyf #12333 e OpenGithubs #33 non hanno risposte. awesome-mcp-servers #16968 e #16969 hanno l'etichetta `missing-glama`: il bot chiede la scheda su Glama e il badge di punteggio nella riga.
+- **Il §9.5 si è fermato alla preparazione**: fatti topic, homepage e pacchetto MCP; nessuna delle azioni "utente" (Show HN, Reddit, social, TWIG, outreach) è partita. Il traffico è finito con l'ultima azione fatta.
+
+### 10.2 Perché adesso
+
+La v0.3.0, uscita oggi, è il primo rilascio con un **Flatpak installabile su qualsiasi distribuzione** (`io.github.openapi.Gknowledge`, remote su Pages) e una funzione con un nome riconoscibile ("pagine che invecchiano quando la fonte cambia"). È esattamente il gancio che §6 (Fase 2) e §9.5 (azione 6) aspettavano per TWIG e Phoronix, e toglie l'obiezione "solo Ubuntu" dallo Show HN.
+
+### 10.3 Sequenza
+
+Calendario: TWIG esce il venerdì, gli item vanno inviati entro giovedì. Lo Show HN resta uno solo (§8.5, §9.4) e va fatto con l'app installabile ovunque.
+
+| Quando | Azione | Chi | Testo |
+|---|---|---|---|
+| lun 19 – mar 20 ott | Rispondere a Justin su dev.to: Flatpak uscito, riga `flatpak install`, chiedergli di provarlo su Fedora (piano in §8.1) | utente | da scrivere insieme |
+| lun 19 – mar 20 ott | Scheda su Glama per `openapi/gknowledge` (il `glama.json` c'è già), poi badge nelle PR #16968 e #16969 | utente (login Glama), noi (badge) | — |
+| mer 21 ott | Discussions attive, annuncio della 0.3.0 lì (§9.5 azione 13); link incrociati dai README di openapi-skills, openapi-python-sdk e mcp-server (azione 10) | noi | — |
+| entro gio 22 ott | **Item TWIG** per la 0.3.0 nella stanza Matrix `#thisweek:gnome.org` | utente | `docs/launch/README.md` |
+| gio 22 – ven 23 ott | Segnalazione a Phoronix e OMG! Ubuntu; articolo di aggiornamento su dev.to ("0.3: now on any distro via Flatpak, and pages that know when their source changed") | utente | `docs/launch/README.md` |
+| settimana del 19 | 3–5 commenti veri su thread HN di LLM wiki o LLM locali; karma Reddit | utente | — |
+| ~~mar 27 o mer 28 ott~~ | ~~Show HN~~: sostituito dal post HN del 19 ott (§10.4). Thread X/Mastodon e post LinkedIn aziendale restano, in un giorno a scelta | utente | `docs/launch/README.md` (aggiornato alla 0.3) |
+| giorno dopo | r/LocalLLaMA e r/ObsidianMD, testi diversi | utente | `docs/launch/README.md` |
+| ven 30 ott | r/selfhosted (New Project Friday) | utente | — |
+| inizio novembre | r/gnome, r/linux; outreach Menon, Theo James, PyCoder's (§8.1); Showcase di r/developersIndia l'8 nov | utente | `outreach.md`, `emerging.md` |
+
+Obiettivo originale: 30+ stelle nelle 24 ore dello Show HN, per entrare nel trending Python (§9.2). Dopo il §10.4 il peso passa a TWIG, Phoronix/OMG! Ubuntu e Reddit. Criterio di verifica: visite uniche e stelle, non clone.
+
+**Stato al 19 ottobre 2026 (sera).**
+
+- Risposta a Justin su dev.to: fatta dall'utente.
+- Annuncio della 0.3 nelle Discussions dell'org, categoria Open Source AI: [#72](https://github.com/orgs/openapi/discussions/72), accanto a quello della 0.2 (#71). Al posto di attivare le Discussions sul repo si usano quelle dell'org: il ticker Pulse le linka da ogni README dell'org, e un secondo spazio dividerebbe una comunità ancora piccola.
+- Link incrociati (azione 10): una riga in openapi-skills e openapi-python-sdk (sezione "Related projects"), in mcp-server ("Useful Resources") e nel README del profilo dell'org. Le PR vanno aperte dall'utente: il classificatore di auto mode blocca le scritture su altri repository.
+- Glama: scheda ancora assente (404 su `glama.ai/mcp/servers/openapi/gknowledge`); serve il login dell'utente.
+
+### 10.4 Il post su Hacker News del 19 ottobre
+
+Il 19 ottobre alle 14:36 UTC l'utente ha pubblicato su HN [*The Second Brain Gnome Users Deserve. Go Ahead, HN. Flag This OpenSourceProject*](https://news.ycombinator.com/item?id=50153030), con link all'annuncio [#72](https://github.com/orgs/openapi/discussions/72) e non al repo, senza prefisso "Show HN". Alla pubblicazione: primo su /newest, visibile anche senza login, 1 punto, 0 commenti.
+
+- **Contesto dell'account** (`hacker-news.firebaseio.com/v0/user/francescobianco`): karma 8; i post del 3, 4, 10 e 13 ottobre e uno del 29 settembre risultano `dead`.
+- **Rischi segnalati e accettati**: titolo che invita al flag, link a una pagina di annuncio invece che al repo, assenza da /show, effetto su un eventuale Show HN successivo. Proposta di cancellarlo finché aveva 0 commenti: **rifiutata**. L'utente accetta di perdere il lancio HN pianificato e sta preparando un repository separato per far crescere il karma dell'account.
+- **Conseguenza per il piano**: lo Show HN del 27/28 ottobre esce dalla sequenza di §10.3. HN resta un canale dell'utente, gestito alle sue condizioni; non va più riproposto nei piani.
+- **Da osservare**: punti, commenti e stato `dead` o `flagged` dell'item 50153030; referrer `news.ycombinator.com` nel traffico del repo e della discussione #72.
