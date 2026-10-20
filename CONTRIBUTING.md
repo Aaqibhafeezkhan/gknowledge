@@ -18,6 +18,8 @@ flatpak install --user flathub org.gnome.Platform//51   # once
 make start-flatpak
 ```
 
+New to developing inside the GNOME SDK? Justin's [Building GNOME Apps with Rust, Part 1: Getting Started](https://fromthearchitect.dev/posts/gnome-rust-part-1-getting-started/) walks through the setup; the toolchain differs, the runtime workflow is the same.
+
 ## Ground rules
 
 - **Core stays headless.** `gknowledge/core/` must not import GTK. UI code lives in `gknowledge/ui/`.
