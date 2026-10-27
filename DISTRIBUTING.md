@@ -305,7 +305,7 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 | [awesome-llm-wiki #12](https://github.com/gavischneider/awesome-llm-wiki/pull/12) | lista awesome (219★, la lista di categoria: nashsu, Tolaria, OpenKnowledge) | 14 ott 2026 | **merged** il 14 ott; ringraziato l'autore il 15 ott con link all'org | nessuno |
 | [awesome-opensource-ai #840](https://github.com/alvinreal/awesome-opensource-ai/pull/840) | lista awesome (4.884★, accanto a Khoj e Newelle) | 14 ott 2026 | **merged** il 15 ott; ringraziato l'autore con link all'org | nessuno |
 | [awesome-gtk #465](https://github.com/valpackett/awesome-gtk/pull/465) | lista awesome (1.268★, Note-taking accanto a Iotas/Folio) | 14 ott 2026 | chiusa il 19 ott su richiesta del maintainer (vedi la riga awesome-gtk più sotto) | — |
-| [Karpathy-LLM-Wiki-Stack](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/pull/2#issuecomment-6165166168) | blueprint (94★, tabella risorse con nashsu) | 14 ott 2026 | richiesta di revisione in un commento sulla PR #2; la #2 è stata mergiata il 14 ott ma gknowledge non è nel README (verificato il 27 ott) | aprire una issue che proponga la riga, descritta per meccanismo |
+| [Karpathy-LLM-Wiki-Stack](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/issues/3) | blueprint (94★, tabella risorse con nashsu) | 14 ott 2026 | **accettato** il 27 ott: dopo la [issue #3](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/issues/3) il maintainer ha aggiunto la riga in §19 con la [PR #4](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/pull/4) ("young, single-maintainer, Linux-only… not tested"), e ha detto che non farà la revisione di fedeltà al pattern. Ringraziato, con l'invito a seguire l'org e la nostra posizione sui dati certificati | nessuna |
 | AlternativeTo | directory | 14 ott 2026 | scheda inviata (coda gratuita, autore "Openapi"), 16 alternative collegate: Reor, Khoj, OpenKnowledge, Tolaria, Gemini Notebook (= NotebookLM), Mempipe, Obsidian, Logseq, SiYuan, Trilium, Zettlr, AnythingLLM, PrivateGPT, Open Notebook, Blinko, Nodus | attendere revisione; non condividere il link prima. La priorità costa $5 |
 | OpenAlternative | directory | 14 ott 2026 | **non inviata**: servono 250★ per repo con meno di 6 mesi (50★ dal 7 gen 2027) e un sito su dominio proprio; le schede gratuite escono una al giorno lavorativo | riprovare con `gknowledge.io` attivo |
 | EveryDev.ai | directory di AI dev tools (c'è OpenKnowledge) | 14 ott 2026 | login GitHub fatto; serve completare l'onboarding del profilo prima di `/create/tool` | completare onboarding, poi compilare con `directories.md` |
@@ -338,7 +338,7 @@ Mappa delle piattaforme trovate il 14 ottobre 2026, raggruppate per modo di acce
 | alvinreal/awesome-opensource-ai | 4.884 | PR #840 merged |
 | valpackett/awesome-gtk | 1.268 | PR #465 |
 | Kazhnuz/awesome-gnome | 1.622 | rimandata (maturità) |
-| ScrapingArt/Karpathy-LLM-Wiki-Stack | 94 | commento |
+| ScrapingArt/Karpathy-LLM-Wiki-Stack | 94 | riga in §19 (PR #4, 27 ott) |
 | weijt606/ai-agent-map | 75 | non valutata a fondo |
 | fsaint/bestOfSecondBrainLLM, zhuyansen/awesome-obsidian-ai-skills, tech-anupam/awesome-agentic-ecosystem, scholar-zishan/awesome-opensource-ai, csells/awesome-jarvis | 0–13 | scartate: traffico nullo |
 | uhub/awesome-llm, uhub/awesome-typescript | — | generate dai topic GitHub: dipendono dai topic del repo |
@@ -570,6 +570,13 @@ Il 19 ottobre alle 14:36 UTC l'utente ha pubblicato su HN [*The Second Brain Gno
 | 7 | **Hacktoberfest finisce il 31 ott**: dopo, la #22 di awesome-hacktoberfest-2026 perde valore. Nessun sollecito; le issue di traduzione (#34–#40) restano `good first issue` per awesome-for-beginners e up-for-grabs | — | non vale un sollecito a un maintainer inattivo da novembre 2025 |
 | 8 | **Un solo sollecito gentile** su awesome-for-beginners #2143 dopo tre settimane (4 nov), se resta ferma | noi | lista da 90k★ con pubblico in India e Africa, coerente con le traduzioni aperte |
 | 9 | **Issue su Karpathy-LLM-Wiki-Stack** che proponga la riga di gknowledge, descritta per meccanismo | noi | la #2 è stata mergiata senza di noi |
+
+**Aggiornamento della sera (27 ott).**
+
+- **#2 LinkedIn**: post per la 0.3 pubblicato. Verificare l'effetto sui referrer il 3 novembre.
+- **#3 stampa**: suggerimenti inviati via email a OMG! Ubuntu e Phoronix con il testo della PR #49, **senza screenshot di proposito**: gli screenshot saranno il motivo di un secondo contatto verso il 26 novembre. **TWIG è rinviato** finché gknowledge non è su Flathub (TWIG vuole app su piattaforme affermate e non accetta note scritte da LLM).
+- **#9 Karpathy-LLM-Wiki-Stack**: issue #3 aperta e **accettata** in giornata (riga in §19 con la PR #4, vedi §8.1).
+- **awesome-mcp-servers #16969**: il bot ha confermato il badge, i requisiti di punkpeye sono soddisfatti, la PR è mergeable. Nessun sollecito prima del 3 novembre; l'ultimo giro di merge del maintainer è del 23 ottobre.
 
 **Da non fare.** Chiedere stelle o follow a chi non ha ancora usato l'app; solleciti alle newsletter cinesi (HelloGitHub smaltisce la coda lentamente, un sollecito non la accelera); cambiare il README per un canale (vedi la memoria del progetto); riproporre HN (§10.4).
 
