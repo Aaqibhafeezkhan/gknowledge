@@ -11,7 +11,7 @@ Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE use
 - [x] `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref` works on Ubuntu (2026-10-19): pulls GNOME 51 from Flathub, installs 0.2.2, the app launches.
 - [x] Inside the Flatpak, New Project failed with "disk I/O error" (SQLite WAL needs shared memory the document portal does not provide); the store no longer uses WAL and converts old databases. Project creation, PDF/Markdown import, ingest, query and drift check verified on a portal path (2026-10-19).
 - [x] Inside the Flatpak, by hand: create a project, import through the file chooser, ingest, reopen after a restart (2026-10-19).
-- [ ] Verify on a non-Ubuntu distro: Justin will install the Flatpak on Fedora 44 the week of 2026-10-20 and open issues for anything that breaks (GitHub `justinf555`); triage them first.
+- [x] Verify on a non-Ubuntu distro: Justin installed the Flatpak on Fedora 44 and reported it works, no issues ([comment of 2026-10-27](https://dev.to/fromthearchitect/comment/3iek7)). Still triage first anything he opens as `justinf555`.
 - [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
 - [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Builds green on PR #42.
 - [x] Release 0.3.0, tagged 2026-10-19: `.deb` and `.flatpak` on the release, `gknowledge-mcp` 0.3.0 on PyPI. A fresh install from the Pages flatpakref works, and the old ID's ref carries the end-of-life-rebase to the new one.
@@ -21,7 +21,7 @@ Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE use
 Develop against the runtime users get
 - [x] `make start-flatpak`: the `make start` loop run inside `org.gnome.Platform` (version read from the manifest), so host GTK/libadwaita differences show up before release.
 - [x] CONTRIBUTING documents `make start-flatpak`.
-- [x] With Justin's permission ([reply of 2026-10-19](https://dev.to/fromthearchitect/comment/3ia9i)), CONTRIBUTING links his GNOME SDK setup write-up (Part 1 of his GNOME + Rust series).
+- [x] With Justin's permission ([reply of 2026-10-19](https://dev.to/fromthearchitect/comment/3ia9i)), CONTRIBUTING links his GNOME SDK setup write-up (Part 1 of his GNOME + Rust series); since 2026-10-27 it links the whole series page, now at Part 6.
 
 Drift, not hallucination
 - [x] `core/lint.py`: `ChangeDetector` flags ingested sources whose original file no longer matches the ingested hash, with the pages that cite them.
