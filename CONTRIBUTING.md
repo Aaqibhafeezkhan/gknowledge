@@ -18,7 +18,7 @@ flatpak install --user flathub org.gnome.Platform//51   # once
 make start-flatpak
 ```
 
-New to developing inside the GNOME SDK? Justin's [Building GNOME Apps with Rust, Part 1: Getting Started](https://fromthearchitect.dev/posts/gnome-rust-part-1-getting-started/) walks through the setup; the toolchain differs, the runtime workflow is the same.
+New to developing inside the GNOME SDK? Justin's series [Building GNOME Apps with Rust](https://fromthearchitect.dev/series/building-gnome-apps-with-rust/) walks through it, starting from the setup in [Part 1: Getting Started](https://fromthearchitect.dev/posts/gnome-rust-part-1-getting-started/) and then GObject, Blueprint, state and signals; the toolchain differs, the runtime workflow is the same.
 
 ## Ground rules
 
